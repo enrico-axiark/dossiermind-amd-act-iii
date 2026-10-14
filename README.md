@@ -18,7 +18,7 @@ from `platform/parsers/requirements.txt` in a virtual environment. Set
 `PYTHON_EXECUTABLE` to that environment's Python. From `platform/`, run:
 
 ```
-node scripts/run-local.mjs
+node --env-file-if-exists=.env scripts/run-local.mjs
 ```
 
 Open http://127.0.0.1:8787/app/ . The development launcher generates private

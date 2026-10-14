@@ -7,6 +7,11 @@
       "bytes": 273
     },
     {
+      "path": ".gitattributes",
+      "sha256": "3cf0ff75c11ac02b0930466d69fa6466fc829b13bc373d908de6a70f0c7b4a56",
+      "bytes": 119
+    },
+    {
       "path": ".gitignore",
       "sha256": "d9cf08a4c51edd5fb28197317579e565f0309da8e0fb772b7d54c67e03787537",
       "bytes": 156
@@ -23,8 +28,8 @@
     },
     {
       "path": "README.md",
-      "sha256": "eb3dc2e70a93ef9bc45e5fcde447808dc062bb1473fc5a350e4a9f68646fb7cd",
-      "bytes": 3495
+      "sha256": "cc80451024a560f3239e7f73e86ea7bdf7bafafb99f01feef23526d5b5719305",
+      "bytes": 3521
     },
     {
       "path": "THIRD-PARTY-NOTICES.md",
@@ -308,8 +313,8 @@
     },
     {
       "path": "platform/package.json",
-      "sha256": "74833275516a83f1a61f7d2ff2f013e04522452e3e7871c93921536858350654",
-      "bytes": 597
+      "sha256": "4f29d2e6c9a27b2d3f8ddfa27cd3f8be5b2f81dff38512abb73e0b40187dd06c",
+      "bytes": 493
     },
     {
       "path": "platform/parsers/extract.py",
@@ -676,5 +681,5 @@
   "private_materials_included": false,
   "old_git_history_included": false,
   "publication": false,
-  "qualification": "review-02 source passed 137 tests; release changes only license, notices, provenance status and footer/README text"
+  "qualification": "review-02 runtime/test source passed 137 tests; release changes license/notices, provenance/footer text, byte-preservation attributes and package launch instructions"
 }

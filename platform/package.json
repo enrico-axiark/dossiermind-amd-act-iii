@@ -9,9 +9,7 @@
   "scripts": {
     "dev": "node --env-file-if-exists=.env --watch src/server.mjs",
     "start": "node --env-file-if-exists=.env src/server.mjs",
-    "bootstrap": "node --env-file-if-exists=.env scripts/bootstrap.mjs",
-    "dev-token": "node scripts/dev-token.mjs",
-    "brain-check": "node scripts/validate-brain-contract.mjs",
+    "bootstrap": "node --env-file-if-exists=.env scripts/bootstrap-event.mjs",
     "test": "node --test",
     "check": "node --check src/server.mjs",
     "security-check": "node scripts/security-check.mjs"
