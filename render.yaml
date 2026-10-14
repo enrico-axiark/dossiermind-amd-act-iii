@@ -1,0 +1,69 @@
+# Deployment candidate: creates paid resources only after review in Render.
+# Existing production OIDC authentication is required; never enable dev auth.
+services:
+  - type: web
+    name: dossiermind-act-iii-demo
+    runtime: docker
+    plan: 0.5c-512mb
+    region: frankfurt
+    numInstances: 1
+    dockerfilePath: ./platform/Dockerfile
+    dockerContext: .
+    healthCheckPath: /health
+    autoDeployTrigger: "off"
+    disk:
+      name: dossiermind-demo-data
+      mountPath: /app/data
+      sizeGB: 1
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: HOST
+        value: 0.0.0.0
+      - key: ALLOW_INSECURE_DEV_AUTH
+        value: "false"
+      - key: DB_PATH
+        value: /app/data/dossiermind.sqlite
+      - key: STORAGE_ROOT
+        value: /app/data/objects
+      - key: MASTER_KEY_B64
+        sync: false
+      - key: AUDIT_KEY_B64
+        sync: false
+      - key: PUBLIC_BASE_URL
+        sync: false
+      - key: ALLOWED_ORIGINS
+        sync: false
+      - key: OIDC_ISSUER
+        sync: false
+      - key: OIDC_CLIENT_ID
+        sync: false
+      - key: OIDC_AUTHORIZATION_URL
+        sync: false
+      - key: OIDC_TOKEN_URL
+        sync: false
+      - key: OIDC_AUDIENCE
+        sync: false
+      # Disabled until cloud identity, seeding and cumulative budget are verified.
+      - key: AMD_INFERENCE_ENABLED
+        value: "false"
+      - key: AMD_BUDGET_CONFIRMED
+        value: "false"
+      - key: AMD_REQUEST_LIMIT
+        value: "0"
+      - key: AMD_INFERENCE_BASE_URL
+        value: https://developer.amd.com.cn/radeon/api/v1
+      - key: AMD_MODEL
+        value: DeepSeek-V4-Flash-Vision-Exp
+      - key: AMD_RESPONSE_MODEL
+        value: self-dploy/DeepSeek-V4-Flash-Vision-Exp
+      - key: AMD_MODEL_REVISION
+        value: Catalog2026-10-13;weights-unverified
+      - key: AMD_RESPONSE_FORMAT
+        value: json_object
+      - key: AMD_MAX_OUTPUT_TOKENS
+        value: "4096"
+      - key: AMD_TIMEOUT_MS
+        value: "120000"
+      - key: MAX_UPLOAD_BYTES
+        value: "10485760"

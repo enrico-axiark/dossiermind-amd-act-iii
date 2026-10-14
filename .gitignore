@@ -1,0 +1,14 @@
+.env
+.env.*
+!*.env.example
+platform/.env
+platform/.env.*
+!platform/.env.example
+platform/data/
+node_modules/
+__pycache__/
+*.pyc
+*.sqlite*
+*.key
+*.pem
+*.log
