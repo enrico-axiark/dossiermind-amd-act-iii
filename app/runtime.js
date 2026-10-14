@@ -887,6 +887,7 @@ async function prepareLogin(){
  for(const id of ['gateClientLogin','gateAccountantLogin'])$(id).disabled=true;
  const response=await fetch('/v1/auth/config',{credentials:'same-origin'});if(!response.ok)throw new Error('Servizio di accesso non disponibile.');
  const config=await response.json();session.authMode=config.mode;
+ text('accessModeLabel',config.mode==='development'?'Accesso locale di sviluppo':config.mode==='competition'?'Demo competizione · accesso protetto':'Accesso protetto');
  if(config.mode==='development'){for(const id of ['gateClientLogin','gateAccountantLogin'])$(id).disabled=false;text('loginMessage','Accesso locale di sviluppo; identità sintetiche.');return;}
  $('localProfile').hidden=config.mode!=='competition';document.querySelector('label[for="localProfile"]').hidden=config.mode!=='competition';
  $('competitionPasswordField').hidden=config.mode!=='competition';
