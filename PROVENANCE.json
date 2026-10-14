@@ -1,5 +1,5 @@
 {
-  "status": "competition release preparation; MIT project implementation; third-party dependency licenses retained",
+  "status": "published competition source; MIT project implementation; third-party dependency licenses retained",
   "preexisting_base_import": "2026-10-11",
   "pre_kickoff_work": "2026-10-12",
   "event_increment_dates": [
@@ -152,5 +152,6 @@
       "path": "platform/scripts/security-check.mjs",
       "change": "check connected candidate frontend; remove reference to omitted master frontend"
     }
-  ]
+  ],
+  "public_repository": "https://github.com/enrico-axiark/dossiermind-amd-act-iii"
 }

@@ -1,7 +1,8 @@
 # DossierMind — ACT III competition prototype
 
-Competition source release preparation. Project code is licensed under MIT.
-Publication and external deployment are still pending.
+Public competition source release. Project code is licensed under MIT.
+Source repository: https://github.com/enrico-axiark/dossiermind-amd-act-iii
+External deployment and online acceptance are still pending.
 Only this prototype is in scope. It contains no production customer archive.
 All supplied document examples are fabricated for testing and demonstration.
 

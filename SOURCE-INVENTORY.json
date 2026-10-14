@@ -1,5 +1,5 @@
 {
-  "status": "release-preparation",
+  "status": "published-source",
   "files": [
     {
       "path": ".dockerignore",
@@ -23,13 +23,13 @@
     },
     {
       "path": "PROVENANCE.json",
-      "sha256": "ea2a6a9a25e7ad2dfa0ad4dac46cf01c9ced7d6ac69e36cf2883a5ddb12b8ccc",
-      "bytes": 15166
+      "sha256": "7732aea107ec0b3c4aa4d3328080743865d1f595d573c6a59cb5a0e6ad81273b",
+      "bytes": 15246
     },
     {
       "path": "README.md",
-      "sha256": "cc80451024a560f3239e7f73e86ea7bdf7bafafb99f01feef23526d5b5719305",
-      "bytes": 3521
+      "sha256": "336eec43bb9a0b511d3f63755cb3896d6581b476d6ef148ad6f5860490b6ca74",
+      "bytes": 3598
     },
     {
       "path": "THIRD-PARTY-NOTICES.md",
@@ -680,6 +680,7 @@
   "license": "MIT for project implementation; third-party licenses preserved",
   "private_materials_included": false,
   "old_git_history_included": false,
-  "publication": false,
-  "qualification": "review-02 runtime/test source passed 137 tests; release changes license/notices, provenance/footer text, byte-preservation attributes and package launch instructions"
+  "publication": true,
+  "qualification": "review-02 runtime/test source passed 137 tests; release changes license/notices, provenance/footer text, byte-preservation attributes and package launch instructions",
+  "public_repository": "https://github.com/enrico-axiark/dossiermind-amd-act-iii"
 }
