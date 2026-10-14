@@ -5,6 +5,7 @@ Source repository: https://github.com/enrico-axiark/dossiermind-amd-act-iii
 Public demo: https://dossiermind-amd-act-iii.onrender.com/app/
 Deployment is live; the core hosted walkthrough passed on 14 October 2026.
 See `JUDGE-GUIDE.md` and `ONLINE-QUALIFICATION.md` for the tested scope and limits.
+The final pitch, cover, edited captioned video and reviewer PDF are in `submission/`.
 Only this prototype is in scope. It contains no production customer archive.
 All supplied document examples are fabricated for testing and demonstration.
 

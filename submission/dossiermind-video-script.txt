@@ -1,0 +1,29 @@
+DossierMind
+Before accounting begins, someone must reconstruct the document context. DossierMind gives clients and accountants a shared document brain. This walkthrough shows actual screens from the hosted prototype, with invented documents and edited timing.
+
+01 / One document intake
+The client starts by uploading the available material into Dossier Inbox. Here we uploaded eleven synthetic documents together: contracts, bank movements, spreadsheets, invoices, email and scans. Original files keep their names and remain inside this client archive. The batch then enters Ingestion Lab.
+
+02 / INGESTIONLAB
+Ingestion Lab preserves the originals, extracts text and builds the client index. This batch completed with nine text documents and two files requiring visual reading. In this prototype, parser extraction and AMD understanding have separate actions and states, so their origins stay visible.
+
+03 / AMD document understanding
+AMD reads selected source passages and proposes a document wiki, its classification, entities and relationships. The service contract identifies Cloud A and Newsletter B. Every displayed quotation links back to an original passage. Unsupported relationships are excluded rather than silently accepted.
+
+04 / Images and scans
+For a scanned receipt, AMD proposes a visual transcription. The original page remains available for comparison. The reviewer can inspect the amount and each line before recording any review. A transcription alone does not establish payment or tax treatment.
+
+05 / The shared document brain
+These sources become a navigable client brain. Its clickable map brings original documents, wiki proposals, attributed notes and reports into one workspace. Selecting a node opens its content and connected sources. Proposed model relationships remain distinguishable from original evidence.
+
+06 / Questions with sources
+The client can question this knowledge. We ask which monthly amounts the contract states and which conditions are missing. Advisor returns three quotations: Cloud A costs one hundred and twenty euros per month, Newsletter B eighty euros, and the document lacks use, notice and penalty conditions. A broader advice request returned insufficient evidence.
+
+07 / The authorized accountant
+The accountant works on the same authorized client dossier. The studio can open the two demonstration clients, while each owner sees only their own archive. Contributions retain their author and source. Suggestions are preparation for professional review, rather than decisions made on behalf of the client.
+
+08 / A report for professional review
+The workflow ends in a downloadable report. This Advisor PDF carries the question, source quotations and review status. A document dossier also lists the original archive and sourced notes. The report is ready to share through the user’s chosen channel. The prototype does not send email itself.
+
+DossierMind before the accounting software
+DossierMind sits before the accounting software: it prepares the documents and their context, while the existing system retains structured records and downstream accounting workflows. The next step is a focused pilot with studios and software partners. Benefits such as preparation time and fewer repeated requests still need measurement. The public prototype and its source repository are available for review.
