@@ -1,0 +1,680 @@
+<!doctype html>
+<html lang="it">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>DossierMind</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%230f172a'/%3E%3Ccircle cx='32' cy='32' r='20' fill='none' stroke='%232dd4bf' stroke-width='3'/%3E%3Cpath d='M18 34c9-17 18 17 28-4' fill='none' stroke='%2360a5fa' stroke-width='3'/%3E%3Ccircle cx='20' cy='34' r='3' fill='%23fbbf24'/%3E%3Ccircle cx='46' cy='30' r='3' fill='%232dd4bf'/%3E%3C/svg%3E">
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <div class="access-gate" id="accessGate" role="dialog" aria-modal="true" aria-labelledby="accessGateTitle" aria-describedby="accessGateDescription">
+      <div class="access-gate-backdrop" aria-hidden="true"></div>
+      <div class="access-gate-shell">
+        <div class="access-gate-header">
+          <div class="access-brand">
+            <div class="access-brand-mark" aria-hidden="true"><span></span><i></i></div>
+            <div><strong>DossierMind</strong><span>Digital context platform</span></div>
+          </div>
+          <span class="access-secure-pill"><span class="secure-dot"></span> Accesso locale di sviluppo</span>
+        </div>
+
+        <div class="access-gate-intro">
+          <div>
+            <span class="access-kicker">IDENTITÀ PRIMA DEL WORKSPACE</span>
+            <h1 id="accessGateTitle">Scegli da quale lato entrare.</h1>
+            <p id="accessGateDescription">DossierMind apre una dashboard diversa in base al ruolo: il cliente governa il proprio cervello digitale, lo studio lavora solo sui clienti per cui esiste un consenso esplicito.</p>
+          </div>
+          <div class="access-live-status"><span class="live-dot"></span><span>Accesso protetto</span><strong>Permessi verificati prima dell’accesso</strong></div>
+        </div>
+
+        <div class="access-network" aria-hidden="true">
+          <span class="access-node node-a">IDENTITÀ</span>
+          <span class="access-line line-a"></span>
+          <span class="access-node node-b">permessi</span>
+          <span class="access-line line-b"></span>
+          <span class="access-core"><i></i><strong>AI POLICY</strong><small>verifica</small></span>
+          <span class="access-line line-c"></span>
+          <span class="access-node node-c">WORKSPACE</span>
+        </div>
+
+        <label for="localProfile">Percorso cliente sintetico</label><select id="localProfile"><option value="pmi">PMI · Aurora Demo SRL</option><option value="privato">Privato · Giulia Demo</option></select><p id="loginMessage" role="status">Accesso locale di sviluppo; OIDC online da configurare.</p><div class="access-choice-grid">
+          <button class="access-choice access-choice-client" id="gateClientLogin" type="button">
+            <span class="access-choice-top"><span class="access-choice-icon" aria-hidden="true">⌂</span><span class="access-choice-tag">PROPRIETARIO</span></span>
+            <span class="access-choice-title">Portale Cliente</span>
+            <span class="access-choice-subtitle">Il tuo archivio, il tuo cervello digitale.</span>
+            <span class="access-choice-description">Conferisci documenti, interroga il contesto aziendale e decidi se concedere o revocare l'accesso allo studio.</span>
+            <span class="access-choice-footer"><span><b>cliente</b><strong>Cliente selezionato</strong></span><span class="access-enter-arrow" aria-hidden="true">→</span></span>
+          </button>
+
+          <button class="access-choice access-choice-studio" id="gateAccountantLogin" type="button">
+            <span class="access-choice-top"><span class="access-choice-icon" aria-hidden="true">▦</span><span class="access-choice-tag">ACCESSO DELEGATO</span></span>
+            <span class="access-choice-title">Console Studio</span>
+            <span class="access-choice-subtitle">Più clienti. Un controllo perimetralizzato.</span>
+            <span class="access-choice-description">Gestisci il portafoglio, verifica consensi e apri un cliente solo quando i permessi sono validi e tracciati.</span>
+            <span class="access-choice-footer"><span><b>permessi</b><strong>Consenso verificato</strong></span><span class="access-enter-arrow" aria-hidden="true">→</span></span>
+          </button>
+        </div>
+
+        <div class="access-gate-footer">
+          <span><i class="footer-check" aria-hidden="true">✓</i> Nessuna identità condivisa</span>
+          <span><i class="footer-check" aria-hidden="true">✓</i> Audit attivo dalla prima azione</span>
+          <span id="gateAiRuntimeBadge">Stato AI da verificare</span>
+        </div>
+        <p class="access-legal-notice">DossierMind · Demo della competizione con soli dati sintetici. Codice della demo distribuito con licenza MIT.</p>
+      </div>
+    </div>
+    <div class="app-shell">
+      <aside class="sidebar" aria-label="Navigazione principale">
+        <div class="brand">
+          <div class="brand-mark" aria-hidden="true">
+            <span></span>
+          </div>
+          <div>
+            <strong>DossierMind</strong>
+            <span>Piattaforma multi-cliente</span>
+          </div>
+        </div>
+
+        <div class="workspace-card" aria-label="Workspace attivo">
+          <div class="workspace-top">
+            <span>cliente attivo</span>
+            <strong id="sideWorkspace">Cliente selezionato</strong>
+            <small id="tenantBadge">—</small>
+          </div>
+          <div class="workspace-brain" aria-hidden="true">
+            <span class="brain-thread t1"></span>
+            <span class="brain-thread t2"></span>
+            <span class="brain-thread t3"></span>
+            <span class="brain-dot d1"></span>
+            <span class="brain-dot d2"></span>
+            <span class="brain-dot d3"></span>
+            <span class="brain-dot d4"></span>
+            <span class="brain-dot d5"></span>
+          </div>
+          <div class="workspace-stats">
+            <div>
+              <strong id="sideDocs">0</strong>
+              <span>doc</span>
+            </div>
+            <div>
+              <strong id="sideLinks">0</strong>
+              <span>link</span>
+            </div>
+            <div>
+              <strong id="sideFocus">Dossier</strong>
+              <span>focus</span>
+            </div>
+          </div>
+        </div>
+
+        <nav class="nav-list">
+          <button class="nav-item" data-view="studio" title="Clienti studio">
+            <span aria-hidden="true">▦</span><span><strong>Clienti studio</strong><small>login master</small></span>
+          </button>
+          <button class="nav-item active" data-view="sandbox" title="Dashboard">
+            <span aria-hidden="true">⌁</span><span><strong>Dashboard</strong><small>workspace live</small></span>
+          </button>
+          <button class="nav-item" data-view="archive" title="Archivio">
+            <span aria-hidden="true">↓</span><span><strong>Dossier Inbox</strong><small>carica documenti</small></span>
+          </button>
+          <button class="nav-item" data-view="ingestion" title="INGESTIONLAB">
+            <span aria-hidden="true">◇</span><span><strong>INGESTIONLAB</strong><small>lettura e classifica</small></span>
+          </button>
+          <button class="nav-item" data-view="brain" title="Cervello digitale">
+            <span aria-hidden="true">◎</span><span><strong>Cervello</strong><small>grafo e relazioni</small></span>
+          </button>
+          <button class="nav-item" data-view="advisor" title="Advisor">
+            <span aria-hidden="true">✦</span><span><strong>Advisor</strong><small>domande con fonti</small></span>
+          </button>
+          <button class="nav-item" data-view="report" title="Report">
+            <span aria-hidden="true">▣</span><span><strong>Report</strong><small>output finale</small></span>
+          </button>
+          <button class="nav-item" data-view="governance" title="Consensi e audit">
+            <span aria-hidden="true">◷</span><span><strong>Consensi & Audit</strong><small>traccia accessi</small></span>
+          </button>
+        </nav>
+
+        <div class="local-card">
+          <div class="status-dot"></div>
+          <div>
+            <strong>Archivi separati</strong>
+            <p>Ogni cliente ha archivio, cervello digitale, audit e permessi separati.</p>
+          </div>
+        </div>
+      </aside>
+
+      <main class="main-content" id="mainContent">
+        <header class="topbar">
+          <div>
+            <div class="eyebrow-row">
+              <p class="eyebrow" id="topContext">Portale cliente / Cliente selezionato</p>
+              <span class="demo-disclosure" id="aiRuntimeBadge">Stato AI da verificare</span>
+            </div>
+            <h1>Documenti, contesto e decisioni. In un unico spazio.</h1>
+          </div>
+          <div class="topbar-actions">
+            <button class="ghost-btn identity-switch-btn" id="switchIdentity" type="button"><span aria-hidden="true">↺</span> Cambia identità</button>
+            <button class="ghost-btn" id="resetDemo">Reset</button>
+          </div>
+        </header>
+
+        <section class="identity-strip" aria-label="Identità e perimetro accesso">
+          <div><span>Ruolo attivo</span><strong id="activeRoleBadge">Cliente · proprietario</strong></div>
+          <div><span id="sharedBrainLabel">Cervello del cliente</span><strong id="sharedBrainBadge">Cliente selezionato</strong></div>
+          <div><span id="accessScopeLabel">Controllo proprietario</span><strong id="accessScopeBadge">Documenti · Advisor · report · consenso</strong></div>
+          <div class="identity-trust"><span>Controllo</span><strong id="identityControlBadge">Revocabile · audit attivo</strong></div>
+        </section>
+
+        <section class="live-strip" aria-label="Stato workspace">
+          <article class="live-tile">
+            <span id="metricClientsLabel">Il tuo archivio</span>
+            <strong id="metricClients">0</strong>
+            <p id="metricClientsNote">archivio riservato</p>
+          </article>
+          <article class="live-tile">
+            <span>cliente attivo</span>
+            <strong id="metricTenant">—</strong>
+            <p>contesto dati selezionato</p>
+          </article>
+          <article class="live-tile">
+            <span>Documenti cliente</span>
+            <strong id="metricArchive">0</strong>
+            <p id="metricArchiveNote">documenti del cliente attivo</p>
+          </article>
+          <article class="live-tile">
+            <span>Audit</span>
+            <strong id="metricQuestions">0</strong>
+            <p>attività registrate nell’archivio</p>
+          </article>
+        </section>
+
+        <section id="studio" class="view" aria-labelledby="studio-title">
+          <div class="section-heading">
+            <div>
+              <h2 id="studio-title">Console Studio Commercialista</h2>
+              <p>Accesso dello studio, scelta del cliente, controllo consenso e apertura del suo archivio riservato.</p>
+            </div>
+            <span class="mode-badge trust-badge">Accesso studio</span>
+          </div>
+
+          <div class="studio-summary" id="studioSummary"></div>
+          <div class="client-grid" id="clientGrid"></div>
+          <section class="studio-workbench" aria-label="Azioni disponibili al commercialista">
+            <div>
+              <span>Workspace condiviso autorizzato</span>
+              <h3>Lo studio lavora sullo stesso cervello del cliente, senza copiarlo</h3>
+              <p>Contributi e operazioni registrate restano nell’archivio del cliente selezionato. Chi ha il permesso di consultare l’audit può leggerne la traccia.</p>
+            </div>
+            <div class="workbench-actions">
+              <button class="workbench-card" data-studio-action="ingestion"><strong>Deposita contributi</strong><span>Carica prospetti, checklist e risposte nell’archivio del cliente</span></button>
+              <button class="workbench-card" data-studio-action="brain"><strong>Consulta cervello</strong><span>Apri nodi, relazioni e fonti</span></button>
+              <button class="workbench-card" data-studio-action="advisor"><strong>Interroga il dossier</strong><span>Risposte con fonti e mancanti</span></button>
+              <button class="workbench-card" data-studio-action="report"><strong>Genera report</strong><span>Chiusura, mancanti o banca</span></button>
+              <button class="workbench-card" data-studio-action="governance"><strong>Verifica audit</strong><span>Accessi, letture, export e revoca</span></button>
+            </div>
+          </section>
+        </section>
+
+        <section id="tenant-empty" class="view" aria-labelledby="tenant-empty-title">
+          <div class="section-heading">
+            <div>
+              <h2 id="tenant-empty-title">Archivio riservato del cliente</h2>
+              <p>Il consenso abilita l’accesso, ma non trasferisce documenti da altri clienti.</p>
+            </div>
+            <span class="mode-badge trust-badge">Confine verificato</span>
+          </div>
+          <div class="empty-tenant-stage">
+            <div class="empty-tenant-orbit" aria-hidden="true"><span></span><span></span><span></span><i></i></div>
+            <div>
+              <span class="document-kicker">WORKSPACE PULITO</span>
+              <h3 id="emptyTenantCompany">Cliente selezionato</h3>
+              <details class="verification-details"><summary>Dettagli di verifica</summary><code id="emptyTenantId"></code></details>
+              <p id="emptyTenantMessage">Questo cliente non ha ancora documenti. Le fonti degli altri clienti restano nei rispettivi archivi.</p>
+              <div class="empty-tenant-metrics">
+                <div><strong id="emptyDocumentCount">0</strong><span>documenti presenti</span></div>
+                <div><strong>Da caricare</strong><span>originali del cliente</span></div>
+                <div><strong id="emptyTenantAudit">Da verificare</strong><span>consultazione audit</span></div>
+              </div>
+              <div class="action-row">
+                <button class="primary-btn" id="emptyTenantUpload" type="button">Apri Dossier Inbox</button>
+                <button class="ghost-btn" id="emptyTenantBackStudio" type="button">Torna alla Console Studio</button>
+                <button class="ghost-btn" id="emptyTenantGovernance" type="button">Apri Consensi & Audit</button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="sandbox" class="view active" aria-labelledby="sandbox-title">
+          <div class="section-heading">
+            <div>
+              <h2 id="sandbox-title">Dashboard Operativa</h2>
+              <p>Vista centrale del cliente: stato documentale, flusso INGESTIONLAB e prossime azioni.</p>
+            </div>
+            <span class="mode-badge" id="consentStatus">Consenso attivo</span>
+          </div>
+
+          <div class="client-contribution-notice" id="clientContributionNotice" hidden aria-live="polite"></div>
+
+          <div class="hero-lab">
+            <div class="hero-copy">
+              <span>Workspace focus</span>
+              <h3 id="scenarioTitle">Chiusura trimestre</h3>
+              <p id="scenarioDescription">Carica gli originali, elabora i documenti e prepara il dossier per il professionista.</p>
+              <div class="action-row">
+                <button class="primary-btn" id="openArchive">Apri Dossier Inbox</button>
+                <button class="ghost-btn" id="jumpBrain">Vedi cervello digitale</button>
+              </div>
+            </div>
+            <div class="signal-board" aria-label="Sequenza guidata">
+              <div class="signal-step active">
+                <span>01</span>
+                <strong>Dossier Inbox</strong>
+                <p>Documenti da fatture, PEC, banca, contratti e ricevute.</p>
+              </div>
+              <div class="signal-step">
+                <span>02</span>
+                <strong>Classificazione</strong>
+                <p>Tipo, periodo, controparte, stato e priorità operative.</p>
+              </div>
+              <div class="signal-step">
+                <span>03</span>
+                <strong>Memoria collegata</strong>
+                <p>Nodi e relazioni appaiono nel grafo.</p>
+              </div>
+              <div class="signal-step">
+                <span>04</span>
+                <strong>Advisor</strong>
+                <p>Domande operative, risposte con fonti e report finale.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="archive" class="view" aria-labelledby="archive-title">
+          <div class="section-heading">
+            <div>
+              <h2 id="archive-title">Dossier Inbox</h2>
+              <p id="archiveDescription">Il cliente conferisce qui i documenti del proprio archivio. La Inbox conserva gli originali e prepara la coda; l'elaborazione avviene una sola volta, dentro INGESTIONLAB.</p>
+              <p class="runtime-note">Per questa demo usa documenti sintetici. Con il motore AI attivo, i passaggi o le immagini necessari all’elaborazione vengono inviati al servizio AMD.</p>
+            </div>
+            <div class="action-row compact">
+              <button class="ghost-btn" id="selectAllDocs">Usa pacchetto pronto</button>
+              <button class="primary-btn" id="openIngestionLab" type="button">Continua in INGESTIONLAB</button>
+            </div>
+          </div>
+
+          <div class="archive-layout">
+            <div class="drop-panel" id="dropPanel">
+              <div class="drop-radar" aria-hidden="true">
+                <span></span><span></span><span></span>
+              </div>
+              <h3 id="dropTitle">Trascina qui i documenti</h3>
+              <p id="dropDescription">PDF, XML, CSV, JPG/PNG, EML e XLSX. I file entrano in Dossier Inbox e vengono preparati per INGESTIONLAB.</p>
+              <div class="action-row">
+                <button class="primary-btn" id="simulateLoad">Usa pacchetto pronto</button>
+                <button class="ghost-btn" id="pickFiles">Scegli file</button>
+              </div>
+              <input id="fileInput" type="file" multiple hidden>
+              <div class="drop-hint" id="dropHint">Rilascia i file qui dentro</div>
+              <div class="demo-pack-hint"><span id="demoPackLabel">PACK DEMO</span><strong id="demoPackTitle">Documenti sintetici PMI e privato</strong><small id="demoPackPath">Dataset ACT III, caricati realmente</small></div>
+            </div>
+            <div class="archive-panel">
+              <div class="panel-title">
+                <h3 id="archivePackageTitle">Pacchetto Cliente selezionato</h3>
+                <span id="selectedCounter">0 selezionati</span>
+              </div>
+              <div class="doc-toolbar">
+                <button class="chip active" data-filter="all">Tutti</button>
+                <button class="chip" data-filter="Fattura">Fatture</button>
+                <button class="chip" data-filter="Banca">Banca</button>
+                <button class="chip" data-filter="Da rivedere">Da rivedere</button>
+              </div>
+              <div class="document-list" id="documentList"></div>
+            </div>
+          </div>
+        </section>
+
+        <section id="ingestion" class="view" aria-labelledby="ingestion-title">
+          <div class="section-heading">
+            <div>
+              <h2 id="ingestion-title">INGESTIONLAB</h2>
+              <p id="ingestionDescription">Gli originali restano conservati. L’estrazione alimenta la ricerca; wiki e lettura visiva hanno richieste e stati separati.</p>
+            </div>
+            <div class="section-heading-actions">
+              <button class="primary-btn" id="quickStart" type="button">Avvia elaborazione</button>
+              <span class="mode-badge trust-badge" id="ingestionRoleBadge">Vista cliente · controllo proprietario</span>
+              <span class="mode-badge" id="ingestionStatus">In attesa</span>
+            </div>
+          </div>
+
+          <div class="ingestion-role-note" id="ingestionRoleNote">
+            <strong>Tu conferisci e controlli.</strong><span>DossierMind conserva i nomi originali, rende visibili le trasformazioni e non modifica le fonti.</span>
+          </div>
+
+          <section class="studio-contribution-panel" id="studioContributionPanel" hidden aria-label="Contributi autorizzati dello studio">
+            <div class="contribution-target">
+              <span>DESTINAZIONE VERIFICATA</span>
+              <strong id="studioContributionTenant">Cliente selezionato · —</strong>
+              <small>Il deposito avviene soltanto nell’archivio del cliente selezionato e nel perimetro dell'incarico.</small>
+            </div>
+            <div class="contribution-copy">
+              <span class="document-kicker">CONTRIBUTI DELLO STUDIO</span>
+              <h3>Lo studio alimenta la stessa memoria, con provenienza visibile.</h3>
+              <p>Prospetti, checklist e risposte professionali entrano come nuove fonti: attore, cliente, data e riferimento del file restano nella ricevuta e nell'audit.</p>
+              <div class="action-row">
+                <button class="primary-btn" id="studioPickFiles" type="button">Carica contributi dello studio</button>
+                <span class="contribution-scope" id="studioContributionScope">Permessi da verificare</span>
+              </div>
+            </div>
+            <div class="contribution-ledger" id="studioContributionLedger">
+              <span class="contribution-empty">Nessun originale conferito da questa identità nel cliente.</span>
+            </div>
+          </section>
+
+          <div class="ingestion-phase-map" id="ingestionPhaseMap" aria-label="Pipeline INGESTIONLAB in due fasi">
+            <article class="ingestion-phase-card" data-ingestion-phase="new-docs">
+              <span>FASE 1 · NUOVI DOCUMENTI</span>
+              <strong id="phaseOneTitle">Comprendere i file appena caricati</strong>
+              <p>Conservazione degli originali, estrazione del testo e indice cliente. La lettura visiva e la wiki hanno richieste separate.</p>
+              <small id="phaseOneMetric">In attesa della selezione</small>
+            </article>
+            <div class="phase-bridge" aria-hidden="true"><span>AI</span></div>
+            <article class="ingestion-phase-card" data-ingestion-phase="cross-link">
+              <span>FASE 2 · INTERO CERVELLO</span>
+              <strong>Collegare alla memoria del cliente</strong>
+              <p>Fonti e contributi collegati, proposte wiki e requisiti concordati. Il collegamento non certifica una riconciliazione.</p>
+              <small id="phaseTwoMetric">Memoria AI da collegare</small>
+            </article>
+          </div>
+
+          <section class="digest-chamber" id="digestChamber" aria-label="Digestione nominativa dei documenti">
+            <div class="digest-queue-panel">
+              <div class="digest-label"><span class="live-dot"></span> CODA DOCUMENTI</div>
+              <div class="digest-queue" id="digestQueue">
+                <span class="digest-empty">Carica i documenti per vedere gli originali presenti nel cliente.</span>
+              </div>
+            </div>
+            <div class="digest-core-panel">
+              <div class="digest-core" id="digestCore" aria-hidden="true">
+                <span class="digest-ring ring-one"></span>
+                <span class="digest-ring ring-two"></span>
+                <span class="digest-scan"></span>
+                <strong>AI</strong>
+              </div>
+              <div class="digest-current">
+                <small id="digestWorkLabel">DOCUMENTO IN LAVORAZIONE</small>
+                <strong id="digestFileName">In attesa dei file</strong>
+                <span id="digestClassification">Nessuna classificazione</span>
+              </div>
+            </div>
+            <div class="digest-stages" id="digestStages">
+              <div data-digest-stage="1"><span>01</span><strong>Lettura del testo</strong></div>
+              <div data-digest-stage="2"><span>02</span><strong>Comprensione</strong></div>
+              <div data-digest-stage="3"><span>03</span><strong>Classificazione</strong></div>
+              <div data-digest-stage="4"><span>04</span><strong>Note AI in preparazione</strong></div>
+              <div data-digest-stage="5"><span>05</span><strong>Indice dei documenti</strong></div>
+            </div>
+          </section>
+
+          <div class="ingestion-receipts" id="ingestionReceipts" aria-live="polite"></div>
+
+          <section class="crosslink-chamber" id="crossLinkChamber" aria-label="Riconciliazione con l'intero cervello digitale">
+            <div class="crosslink-copy">
+              <div class="digest-label"><span class="live-dot"></span> COLLEGAMENTI CON PROVENIENZA</div>
+              <h3 id="crossLinkTitle">Collegamenti da verificare</h3>
+              <p id="crossLinkNarrative">La mappa mostra i collegamenti disponibili tra fonti, note, calcoli, checklist e report. Le proposte del modello restano da verificare.</p>
+              <div class="crosslink-progress"><span id="crossLinkBar"></span></div>
+            </div>
+            <div class="memory-field" aria-hidden="true">
+              <span class="memory-core">BRAIN</span>
+              <i style="--i:0"></i><i style="--i:1"></i><i style="--i:2"></i><i style="--i:3"></i><i style="--i:4"></i><i style="--i:5"></i>
+            </div>
+            <div class="crosslink-stats">
+              <article><span>Fonti presenti</span><strong id="crossLinkScanned">0</strong><small id="crossLinkTotal">su 0 esistenti</small></article>
+              <article><span>Collegamenti registrati</span><strong id="crossLinkRelations">0</strong><small>fonti e derivati con provenienza</small></article>
+              <article><span>Affermazioni umane</span><strong id="crossLinkFindings">0</strong><small>osservazioni con revisione attribuita</small></article>
+            </div>
+          </section>
+
+          <div class="ingestion-story" id="ingestionStory" aria-label="Trasformazione da documenti a cervello digitale">
+            <article class="story-stage" data-story-stage="documents">
+              <span class="story-icon" aria-hidden="true">▤</span>
+              <div><small>01 · INPUT</small><strong id="storyDocs">0 documenti</strong><p>Conferiti senza riordino preventivo</p></div>
+            </article>
+            <span class="story-connector" aria-hidden="true"></span>
+            <article class="story-stage" data-story-stage="markdown">
+              <span class="story-icon" aria-hidden="true">MD</span>
+              <div><small>02 · MEMORIA</small><strong id="storyNotes">0 note documentali</strong><p>Leggibili, catalogate e indicizzate</p></div>
+            </article>
+            <span class="story-connector" aria-hidden="true"></span>
+            <article class="story-stage" data-story-stage="graph">
+              <span class="story-icon" aria-hidden="true">◎</span>
+              <div><small>03 · CONTESTO</small><strong id="storyLinks">0 collegamenti</strong><p>Fonti, periodi, entità e anomalie</p></div>
+            </article>
+            <span class="story-connector" aria-hidden="true"></span>
+            <article class="story-stage" data-story-stage="outputs">
+              <span class="story-icon" aria-hidden="true">✓</span>
+              <div><small>04 · OUTPUT</small><strong id="storyOutput">In preparazione</strong><p>Advisor e report con fonti visibili</p></div>
+            </article>
+          </div>
+
+          <div class="ingestion-layout">
+            <div class="pipeline-panel">
+              <div class="panel-title">
+                <h3>Lettura dei documenti</h3>
+                <span id="pipelinePercent">0%</span>
+              </div>
+              <div class="progress-track"><div id="progressBar"></div></div>
+              <div class="pipeline" id="pipeline"></div>
+            </div>
+            <div class="console-panel">
+              <div class="panel-title">
+                <h3>Attività di elaborazione</h3>
+                <span>Avanzamento</span>
+              </div>
+              <div class="console-feed" id="consoleFeed"></div>
+            </div>
+          </div>
+          <div class="artifact-grid" aria-label="Output del cervello digitale">
+            <article>
+              <span>Memoria leggibile</span>
+              <strong id="markdownCount">0 note documentali</strong>
+              <p>Proposte wiki e contributi umani con fonti sono consultabili nel Cervello, con stato e revisione separati.</p>
+            </article>
+            <article>
+              <span>Indice dei documenti</span>
+              <strong id="indexStatus">Indice in preparazione</strong>
+              <p>Ricerca per parole chiave nel testo disponibile, separata per cliente. Le entità proposte dalla wiki sono nel Cervello.</p>
+            </article>
+            <article>
+              <span>Relazioni</span>
+              <strong id="artifactLinks">0 link</strong>
+              <p>Collegamenti navigabili tra fonti, contesto, anomalie, domande e report.</p>
+            </article>
+            <article class="artifact-trust">
+              <span>Governance AI</span>
+              <strong>Prepara, non decide</strong>
+              <p>Originali, contributi e derivati conservano provenienza e permessi. Lo stato AI e le revisioni indicano cosa è disponibile.</p>
+            </article>
+          </div>
+        </section>
+
+        <section id="brain" class="view" aria-labelledby="brain-title">
+          <div class="section-heading">
+            <div>
+              <h2 id="brain-title">Cervello Digitale</h2>
+              <p>Una visuale navigabile del cliente attivo: documenti, entità, periodi, anomalie e report restano nel perimetro del cliente selezionato.</p>
+            </div>
+            <span class="mode-badge trust-badge" id="brainRoleBadge">Vista cliente · proprietario</span>
+          </div>
+
+          <div class="shared-access-banner" id="sharedAccessBanner"></div>
+
+          <div class="brain-layout">
+            <div class="brain-stage" id="brainStage" aria-label="Grafo del cervello digitale"></div>
+            <aside class="brain-detail" id="brainDetail"></aside>
+          </div>
+        </section>
+
+        <section id="advisor" class="view" aria-labelledby="advisor-title">
+          <div class="section-heading">
+            <div>
+              <h2 id="advisor-title">Advisor</h2>
+              <p id="advisorIntro">Consulta le fonti del cliente per preparare la tua domanda.</p>
+            </div>
+            <span class="mode-badge trust-badge">Fonti cliente</span>
+          </div>
+
+          <section class="ai-command-center" aria-label="Capacità dell'intelligenza artificiale">
+            <div class="ai-core-card">
+              <div class="ai-core-orbit" aria-hidden="true"><span></span><span></span><span></span></div>
+              <div>
+                <small>DOSSIER DEL CLIENTE SELEZIONATO</small>
+                <h3>Partiamo dalle fonti</h3>
+                <p id="advisorCapabilityDescription">Cerca nei documenti e apri i passaggi originali.</p>
+              </div>
+              <span class="mode-badge" id="advisorCapabilityStatus">Stato AI da verificare</span>
+            </div>
+            <div class="ai-capability-grid">
+              <article><span>⌕</span><strong>Ricerca nei testi</strong><p>Trova passaggi attraverso le parole presenti nei documenti.</p></article>
+              <article><span>◎</span><strong>Fonti originali</strong><p>Apri pagina, riga o cella e controlla il contesto.</p></article>
+              <article><span>↗</span><strong id="advisorAnalysisTitle">Analisi con fonti</strong><p id="advisorAnalysisDescription">Suggerimenti e scenari richiedono la verifica delle fonti.</p></article>
+              <article><span>?</span><strong>Contributi dello studio</strong><p>Registra note e affermazioni con fonti e revisione nel Cervello.</p></article>
+              <article><span>▣</span><strong>Report documentali</strong><p>Genera PDF dalle fonti selezionate nella sezione Report.</p></article>
+              <article><span>✓</span><strong>Permessi e audit</strong><p>Accessi verificati per cliente e attività registrate.</p></article>
+            </div>
+            <div class="ai-reasoning-strip" id="aiReasoningStrip" aria-live="polite">
+              <span><i></i> Cerca nei testi</span><b>→</b><span><i></i> Consulta le fonti</span><b>→</b><span><i></i> Verifica il contesto</span>
+            </div>
+          </section>
+
+          <div class="advisor-layout">
+            <div class="question-bank" id="questionBank"></div>
+            <div class="chat-panel">
+              <div class="chat-stream" id="chatStream"></div>
+              <form class="ask-form" id="askForm">
+                <input id="askInput" type="text" maxlength="500" placeholder="Scrivi una domanda per cercare le fonti" aria-label="Domanda per cercare le fonti">
+                <button class="primary-btn" type="submit">Cerca fonti</button>
+              </form>
+              <div class="runtime-note advisor-context-controls">
+                <label class="advisor-context-label">Contesto della domanda<textarea id="advisorContext" maxlength="2000" placeholder="Obiettivo e dettagli che vuoi chiarire"></textarea></label>
+                <label>Periodo da <input id="advisorStart" type="date"></label>
+                <label>Periodo a <input id="advisorEnd" type="date"></label>
+                <label class="advisor-context-label">Calcoli salvati da consultare (massimo due)<select id="advisorCalculations" multiple aria-label="Calcoli da includere nella domanda"></select></label>
+                <label class="advisor-context-label">Contributi cliente e studio (massimo quattro)<select id="advisorContributions" multiple aria-label="Contributi da includere nella domanda"></select></label>
+                <button id="saveAdvisorRequest" class="primary-btn" type="button">Invia domanda all’Advisor</button>
+                <p id="advisorQueueNotice">Il periodo dichiarato non certifica la completezza dei documenti.</p>
+              </div>
+              <div id="advisorHistory" aria-live="polite"></div>
+            </div>
+          </div>
+        </section>
+
+        <section id="report" class="view" aria-labelledby="report-title">
+          <div class="section-heading">
+            <div>
+              <h2 id="report-title">Report Finale</h2>
+              <p>Il cliente e lo studio autorizzato possono generare output diversi dallo stesso cervello, sempre con fonti e audit.</p>
+            </div>
+            <div class="report-actions">
+              <select id="reportType" aria-label="Tipo di report">
+                <option value="close">Dossier di periodo</option>
+                <option value="missing">Documenti mancanti</option>
+                <option value="bank">Riconciliazione banca</option>
+                <option value="studio">Brief operativo per lo studio</option>
+              </select>
+              <button class="primary-btn" id="generateReport">Genera report</button>
+            </div>
+          </div>
+
+          <div class="report-layout">
+            <article class="report-preview" id="reportPreview"></article>
+            <aside class="export-panel">
+              <div class="panel-title">
+                <h3>Pacchetto esportabile</h3>
+                <span>locale</span>
+              </div>
+              <div class="export-list" id="exportList"></div>
+            </aside>
+          </div>
+        </section>
+
+        <section id="governance" class="view" aria-labelledby="governance-title">
+          <div class="section-heading">
+            <div>
+              <h2 id="governance-title">Consensi, Protezione dei dati e Audit</h2>
+              <p>Collegamento esplicito cliente-studio, separazione dei dati e tracciamento delle azioni del commercialista.</p>
+            </div>
+            <span class="mode-badge trust-badge">Privacy by design</span>
+          </div>
+
+          <div class="governance-layout">
+            <div id="consentPanel"></div>
+            <aside class="audit-panel">
+              <div class="panel-title">
+                <h3>Audit verificabile</h3>
+                <span>catena hash · demo</span>
+              </div>
+              <div class="audit-integrity" id="auditIntegrity"></div>
+              <div class="audit-list" id="auditList"></div>
+            </aside>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+    <div class="experience-moment" id="experienceMoment" aria-hidden="true">
+      <div class="experience-backdrop"></div>
+      <section class="experience-card" role="status" aria-live="polite">
+        <div class="experience-orbit" aria-hidden="true"><span></span><span></span><span></span></div>
+        <small id="momentKicker">DOSSIERMIND</small>
+        <h2 id="momentTitle">Contesto aggiornato</h2>
+        <p id="momentBody"></p>
+        <div class="moment-steps" id="momentSteps"></div>
+      </section>
+    </div>
+
+    <div class="scenario-dock" id="scenarioDock">
+      <button class="scenario-toggle" id="scenarioToggle" aria-expanded="false" aria-controls="scenarioMenu">
+        <span aria-hidden="true">⌘</span>
+        <strong>Apri vista</strong>
+      </button>
+      <div class="scenario-menu" id="scenarioMenu" aria-label="Collegamenti rapidi">
+        <div class="panel-title">
+          <h3>Focus rapidi</h3>
+          <span>viste del cliente</span>
+        </div>
+        <button class="scenario-build" id="completeBrain" type="button">
+          <span>Apri cervello digitale</span>
+          <small>Consulta fonti, contributi e collegamenti disponibili</small>
+        </button>
+        <div class="scenario-list" id="scenarioGrid"></div>
+      </div>
+    </div>
+
+    <div class="pdf-modal" id="pdfModal" aria-hidden="true">
+      <div class="pdf-backdrop" id="closePdfBackdrop"></div>
+      <section class="pdf-viewer" role="dialog" aria-modal="true" aria-labelledby="pdfTitle">
+        <header class="pdf-toolbar">
+          <div>
+            <span id="pdfKind">PDF report</span>
+            <h3 id="pdfTitle">report_q2_acme.pdf</h3>
+          </div>
+          <div class="pdf-actions">
+            <button class="ghost-btn" id="sharePdf">Condividi</button>
+            <button class="ghost-btn" id="downloadPdf">Scarica</button>
+            <button class="ghost-btn" id="mailPdf">Invia via mail</button>
+            <button class="ghost-btn" id="copyPdfLink">Copia link</button>
+            <button class="ghost-btn icon-btn" id="closePdf" aria-label="Chiudi report">×</button>
+          </div>
+        </header>
+        <div class="pdf-paper" id="pdfPaper"></div>
+      </section>
+    </div>
+
+  <script src="runtime.js"></script>
+  </body>
+</html>
