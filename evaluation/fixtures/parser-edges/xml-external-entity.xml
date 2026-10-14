@@ -1,0 +1,1 @@
+<!DOCTYPE invoice [<!ENTITY external SYSTEM "https://example.invalid/never-fetch">]><invoice>&external;</invoice>

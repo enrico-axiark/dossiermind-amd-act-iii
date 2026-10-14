@@ -1,0 +1,14 @@
+From: demo@example.test
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="fixture"
+
+--fixture
+Content-Type: text/plain
+
+Synthetic body.
+--fixture
+Content-Type: application/octet-stream
+Content-Disposition: attachment; filename="../../outside-fixture.txt"
+
+Synthetic attachment.
+--fixture--

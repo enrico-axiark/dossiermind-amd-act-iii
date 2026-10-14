@@ -1,0 +1,186 @@
+{
+  "synthetic": true,
+  "exclude_from_ingestion": [
+    "manifest.json",
+    "*.inspect.ndjson"
+  ],
+  "files": [
+    {
+      "path": "datasets/pmi/banca-settembre.csv",
+      "tenant_key": "pmi",
+      "synthetic": true,
+      "sha256": "9f9b1683e271fe840edea8d8a1a421793fa875b69e80cb9ed9a0e2d95bdc73e3",
+      "bytes": 380,
+      "phase": "pre-event-preparation"
+    },
+    {
+      "path": "datasets/pmi/checklist-studio.pdf",
+      "tenant_key": "pmi",
+      "synthetic": true,
+      "sha256": "165c3a049393d0f009de231b7af4eab45cd33696de29939b8a44e2247a6e09a4",
+      "bytes": 1956,
+      "phase": "pre-event-preparation"
+    },
+    {
+      "path": "datasets/pmi/contratto-servizi.pdf",
+      "tenant_key": "pmi",
+      "synthetic": true,
+      "sha256": "36938b880051b5a6ea0a7ff27572b06a9b62ddb66ebc11bd8a0e13efaf0d9623",
+      "bytes": 1923,
+      "phase": "pre-event-preparation"
+    },
+    {
+      "path": "datasets/pmi/contributo-studio.pdf",
+      "tenant_key": "pmi",
+      "synthetic": true,
+      "sha256": "f6f639ea5f5cf6d136a1ebaa9dd7f452e815f9acdaada79488d7ae633dc2f13f",
+      "bytes": 1952,
+      "phase": "pre-event-preparation"
+    },
+    {
+      "path": "datasets/pmi/fattura-importo-in-conflitto.pdf",
+      "tenant_key": "pmi",
+      "synthetic": true,
+      "sha256": "d2ef52ffb370af1ef4aa8bc5911a353da8ccdae40bf3ab7eca0d93298b4d0d0a",
+      "bytes": 1913,
+      "phase": "pre-event-preparation"
+    },
+    {
+      "path": "datasets/pmi/fattura-settembre.xml",
+      "tenant_key": "pmi",
+      "synthetic": true,
+      "sha256": "7acead78ea4ed4717828941e595458eccd5e8ad4de4585999ed3ef18286427b7",
+      "bytes": 340,
+      "phase": "pre-event-preparation"
+    },
+    {
+      "path": "datasets/pmi/istruzioni-ostili.pdf",
+      "tenant_key": "pmi",
+      "synthetic": true,
+      "sha256": "31560ca9a1d85c52a90963c92218424a17eb52f029aba425bd9222201696cdbc",
+      "bytes": 1929,
+      "phase": "pre-event-preparation"
+    },
+    {
+      "path": "datasets/pmi/ricevuta-scansione.pdf",
+      "tenant_key": "pmi",
+      "synthetic": true,
+      "sha256": "529c3df246c587d46e357da7a15119887cccefa07cee9160ee953d2a723746da",
+      "bytes": 43721,
+      "phase": "pre-event-preparation"
+    },
+    {
+      "path": "datasets/pmi/ricevuta.jpg",
+      "tenant_key": "pmi",
+      "synthetic": true,
+      "sha256": "794c92b7e6a571dc59a3e5acf3465f0013ebbf0125af40e82e8128a04d00fa4b",
+      "bytes": 84553,
+      "phase": "pre-event-preparation"
+    },
+    {
+      "path": "datasets/pmi/richiesta-studio.eml",
+      "tenant_key": "pmi",
+      "synthetic": true,
+      "sha256": "a3dedf2d930d725f28bfd71f3b0cdd615395724b60f28bf177144bbb0078d8b3",
+      "bytes": 3493,
+      "phase": "pre-event-preparation"
+    },
+    {
+      "path": "datasets/pmi/spese-settembre.xlsx",
+      "tenant_key": "pmi",
+      "synthetic": true,
+      "sha256": "626649bd7786bc961e9a228b4445c0f463ff84768297dd9bf94cc42a4208977d",
+      "bytes": 4107,
+      "phase": "pre-event-preparation"
+    },
+    {
+      "path": "datasets/privato/banca-settembre.csv",
+      "tenant_key": "privato",
+      "synthetic": true,
+      "sha256": "1ab0427a61b59e75cb154c85235ebdc86aab9f85e9f71d22b5741c875e32bf60",
+      "bytes": 382,
+      "phase": "pre-event-preparation"
+    },
+    {
+      "path": "datasets/privato/checklist-studio.pdf",
+      "tenant_key": "privato",
+      "synthetic": true,
+      "sha256": "f0aaa71cc3aa87694e21adfb0c284145c95f8cf815a9a449e307de0ae255bb21",
+      "bytes": 1950,
+      "phase": "pre-event-preparation"
+    },
+    {
+      "path": "datasets/privato/contratto-servizi.pdf",
+      "tenant_key": "privato",
+      "synthetic": true,
+      "sha256": "2608c4547374393b74194f6d2ad228c467e388af9a7ec9ff209354d9efc059cf",
+      "bytes": 1914,
+      "phase": "pre-event-preparation"
+    },
+    {
+      "path": "datasets/privato/contributo-studio.pdf",
+      "tenant_key": "privato",
+      "synthetic": true,
+      "sha256": "35d0b8515e46620b79667bd7b8d0d1cffb7382f05de57e657a21304782c2b609",
+      "bytes": 1949,
+      "phase": "pre-event-preparation"
+    },
+    {
+      "path": "datasets/privato/fattura-importo-in-conflitto.pdf",
+      "tenant_key": "privato",
+      "synthetic": true,
+      "sha256": "b02a6e355f1c2f75583c47e80dc91c64c51c2928443a8c7c68ae860a903c3931",
+      "bytes": 1910,
+      "phase": "pre-event-preparation"
+    },
+    {
+      "path": "datasets/privato/fattura-settembre.xml",
+      "tenant_key": "privato",
+      "synthetic": true,
+      "sha256": "e103924bf4ba013ab563cb7d500f1b173aa6622e99983209d11a86f2868b46c5",
+      "bytes": 335,
+      "phase": "pre-event-preparation"
+    },
+    {
+      "path": "datasets/privato/istruzioni-ostili.pdf",
+      "tenant_key": "privato",
+      "synthetic": true,
+      "sha256": "226fef6965252f45e94f9a87cd8b9a5b7332b157aa93a21156c43bedc0fac624",
+      "bytes": 1925,
+      "phase": "pre-event-preparation"
+    },
+    {
+      "path": "datasets/privato/ricevuta-scansione.pdf",
+      "tenant_key": "privato",
+      "synthetic": true,
+      "sha256": "7cdc36b86a6631edd9696fd7ab0f46703c2509a1e6bbb80d7eb694950b3a1f33",
+      "bytes": 44378,
+      "phase": "pre-event-preparation"
+    },
+    {
+      "path": "datasets/privato/ricevuta.jpg",
+      "tenant_key": "privato",
+      "synthetic": true,
+      "sha256": "3cc955ed05bae8c747077810029fe0891e06f85119ca2ad0d5fa7d303f647c6d",
+      "bytes": 85630,
+      "phase": "pre-event-preparation"
+    },
+    {
+      "path": "datasets/privato/richiesta-studio.eml",
+      "tenant_key": "privato",
+      "synthetic": true,
+      "sha256": "128cd730bc3a71932b0c78206d9481730187e209097d29eda2e2bbefd27be06d",
+      "bytes": 3485,
+      "phase": "pre-event-preparation"
+    },
+    {
+      "path": "datasets/privato/spese-settembre.xlsx",
+      "tenant_key": "privato",
+      "synthetic": true,
+      "sha256": "e03b680ecb28fae9e2f7fa1bb5c2f12b5007ad3b42e2971379521f9bc92db52e",
+      "bytes": 4097,
+      "phase": "pre-event-preparation"
+    }
+  ],
+  "notice": "All supplied cases are fabricated; never upload real customer data to the competition demo."
+}

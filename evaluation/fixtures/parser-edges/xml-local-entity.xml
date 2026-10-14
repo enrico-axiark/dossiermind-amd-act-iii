@@ -1,0 +1,1 @@
+<!DOCTYPE invoice [<!ENTITY external SYSTEM "file:///nonexistent-act-iii-fixture">]><invoice>&external;</invoice>

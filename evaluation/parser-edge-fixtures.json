@@ -1,0 +1,278 @@
+{
+  "phase": "pre-event-preparation",
+  "synthetic": true,
+  "initial_corpus": false,
+  "purpose": "Parser/security qualification after implementation. Not AI evidence or model tuning.",
+  "status": "runtime-qualified",
+  "cases": [
+    {
+      "id": "pdf-truncated",
+      "path": "evaluation/fixtures/parser-edges/pdf-truncated.pdf",
+      "bytes": 45,
+      "sha256": "1e588c463b08938e295953be8fa9a2d27abea1f88e92bfdc2d13c3f92a06db3b",
+      "declared_mime": "application/pdf",
+      "expected_outcome": "reject",
+      "reason_category": "unreadable_document",
+      "acceptance": "No fabricated text or empty successful ingestion.",
+      "runtime_result": {
+        "id": "pdf-truncated",
+        "passed": true,
+        "outcome": "reject",
+        "code": "unreadable_document",
+        "stage": "parser"
+      }
+    },
+    {
+      "id": "pdf-wrong-magic",
+      "path": "evaluation/fixtures/parser-edges/pdf-wrong-magic.pdf",
+      "bytes": 18,
+      "sha256": "5e944743426dc21dde2eef223f17c90e30c31a8015b4f244402e27181e2ffa8d",
+      "declared_mime": "application/pdf",
+      "expected_outcome": "reject",
+      "reason_category": "mime_mismatch",
+      "acceptance": "Declared MIME and extension cannot establish content type.",
+      "runtime_result": {
+        "id": "pdf-wrong-magic",
+        "passed": true,
+        "outcome": "reject",
+        "code": "mime_mismatch",
+        "stage": "upload"
+      }
+    },
+    {
+      "id": "xml-external-entity",
+      "path": "evaluation/fixtures/parser-edges/xml-external-entity.xml",
+      "bytes": 113,
+      "sha256": "3b9e1dd6e9b29a112b3214b7030b8d847233c70dcd3a8955d04f0936d76148fa",
+      "declared_mime": "application/xml",
+      "expected_outcome": "reject",
+      "reason_category": "unsafe_xml",
+      "acceptance": "No DNS, HTTP or external entity resolution.",
+      "runtime_result": {
+        "id": "xml-external-entity",
+        "passed": true,
+        "outcome": "reject",
+        "code": "unsafe_xml",
+        "stage": "parser"
+      }
+    },
+    {
+      "id": "xml-local-entity",
+      "path": "evaluation/fixtures/parser-edges/xml-local-entity.xml",
+      "bytes": 113,
+      "sha256": "d6739bab247740b8521dfda68fa7fbec28c6a649abd1505593d3117ba9532d1a",
+      "declared_mime": "application/xml",
+      "expected_outcome": "reject",
+      "reason_category": "unsafe_xml",
+      "acceptance": "No local file lookup or entity expansion.",
+      "runtime_result": {
+        "id": "xml-local-entity",
+        "passed": true,
+        "outcome": "reject",
+        "code": "unsafe_xml",
+        "stage": "parser"
+      }
+    },
+    {
+      "id": "xml-malformed",
+      "path": "evaluation/fixtures/parser-edges/xml-malformed.xml",
+      "bytes": 32,
+      "sha256": "4269548986c13ef0f5a83cb0ffd7982d83d751a3a85a64114fcf8e27f1758a50",
+      "declared_mime": "application/xml",
+      "expected_outcome": "reject",
+      "reason_category": "unreadable_document",
+      "acceptance": "XML syntax error is explicit.",
+      "runtime_result": {
+        "id": "xml-malformed",
+        "passed": true,
+        "outcome": "reject",
+        "code": "unreadable_document",
+        "stage": "parser"
+      }
+    },
+    {
+      "id": "xlsx-traversal",
+      "path": "evaluation/fixtures/parser-edges/xlsx-traversal.xlsx",
+      "bytes": 299,
+      "sha256": "9e15bfde2b7d3bd37819632a7975a880d05bb96296ebdc4ab6f012f6a0c3a015",
+      "declared_mime": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      "expected_outcome": "reject",
+      "reason_category": "unsafe_archive",
+      "acceptance": "Validate every archive member before processing; no files outside scratch directory.",
+      "runtime_result": {
+        "id": "xlsx-traversal",
+        "passed": true,
+        "outcome": "reject",
+        "code": "unsafe_archive",
+        "stage": "parser"
+      }
+    },
+    {
+      "id": "xlsx-truncated",
+      "path": "evaluation/fixtures/parser-edges/xlsx-truncated.xlsx",
+      "bytes": 13,
+      "sha256": "43590a67dc6fd1bdd55ade65ad3bb2261aea3aaca0d93111e2e34fe577bf43eb",
+      "declared_mime": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      "expected_outcome": "reject",
+      "reason_category": "unreadable_document",
+      "acceptance": "ZIP magic alone is insufficient.",
+      "runtime_result": {
+        "id": "xlsx-truncated",
+        "passed": true,
+        "outcome": "reject",
+        "code": "unreadable_document",
+        "stage": "parser"
+      }
+    },
+    {
+      "id": "eml-remote-html",
+      "path": "evaluation/fixtures/parser-edges/eml-remote-html.eml",
+      "bytes": 226,
+      "sha256": "09a3a22329d3c2cebbc6d69c0d620b42083b6d45863d5915ae900d0dd4d8e82e",
+      "declared_mime": "message/rfc822",
+      "expected_outcome": "accept-with-warning",
+      "reason_category": "remote_resources_ignored",
+      "acceptance": "Extract local text, never request remote resources or render active HTML.",
+      "runtime_result": {
+        "id": "eml-remote-html",
+        "passed": true,
+        "outcome": "accept",
+        "warnings": [
+          "remote_resources_ignored"
+        ],
+        "fragments": 2,
+        "stage": "parser"
+      }
+    },
+    {
+      "id": "eml-path-attachment",
+      "path": "evaluation/fixtures/parser-edges/eml-path-attachment.eml",
+      "bytes": 313,
+      "sha256": "eddba108979871d5531fae71c9c15f2ef06cde172c9526ec9e95380d2e5c3519",
+      "declared_mime": "message/rfc822",
+      "expected_outcome": "accept-with-warning",
+      "reason_category": "unsafe_attachment_name",
+      "acceptance": "Preserve body, reject unsafe attachment or use generated safe identity; report explicit attachment outcome.",
+      "runtime_result": {
+        "id": "eml-path-attachment",
+        "passed": true,
+        "outcome": "accept",
+        "warnings": [
+          "unsafe_attachment_name"
+        ],
+        "fragments": 2,
+        "stage": "parser"
+      }
+    },
+    {
+      "id": "csv-european-decimal",
+      "path": "evaluation/fixtures/parser-edges/csv-european-decimal.csv",
+      "bytes": 78,
+      "sha256": "05a9dfdb89e256f014702aaba34d506e803d92e4c2b9a89af207dd7a5bb53dc5",
+      "declared_mime": "text/csv",
+      "expected_outcome": "accept",
+      "reason_category": "locale_explicit",
+      "acceptance": "Recognize semicolon and decimal comma; EUR 1234.56 then -12.34, if conventions explicitly supported.",
+      "runtime_result": {
+        "id": "csv-european-decimal",
+        "passed": true,
+        "outcome": "accept",
+        "warnings": [],
+        "fragments": 2,
+        "stage": "parser",
+        "valuesPreserved": true,
+        "numericNormalization": "not-executed"
+      }
+    },
+    {
+      "id": "csv-ambiguous-date",
+      "path": "evaluation/fixtures/parser-edges/csv-ambiguous-date.csv",
+      "bytes": 29,
+      "sha256": "d6017b02f3702d5b8208f056797dfeac0b273101412cd15b72c7b093d1d603ca",
+      "declared_mime": "text/csv",
+      "expected_outcome": "review-required",
+      "reason_category": "ambiguous_date",
+      "acceptance": "Do not silently choose 3 April or 4 March without date convention.",
+      "runtime_result": {
+        "id": "csv-ambiguous-date",
+        "passed": true,
+        "outcome": "accept",
+        "warnings": [
+          "ambiguous_date"
+        ],
+        "fragments": 1,
+        "stage": "parser"
+      }
+    },
+    {
+      "id": "csv-formula-text",
+      "path": "evaluation/fixtures/parser-edges/csv-formula-text.csv",
+      "bytes": 48,
+      "sha256": "18821dc34975aa0cf9028e08ec4c2a714b1d5e7e8e5c5f09a4101d31a25a8557",
+      "declared_mime": "text/csv",
+      "expected_outcome": "accept-with-warning",
+      "reason_category": "formula_text",
+      "acceptance": "Treat description as text; never execute formula. Escape spreadsheet export when applicable.",
+      "runtime_result": {
+        "id": "csv-formula-text",
+        "passed": true,
+        "outcome": "accept",
+        "warnings": [
+          "formula_text"
+        ],
+        "fragments": 1,
+        "stage": "parser"
+      }
+    },
+    {
+      "id": "jpeg-truncated",
+      "path": "evaluation/fixtures/parser-edges/jpeg-truncated.jpg",
+      "bytes": 13,
+      "sha256": "dc3c9953d2767f7743bc7f21f6000a706415707fd89c46699e46b0107045accb",
+      "declared_mime": "image/jpeg",
+      "expected_outcome": "reject",
+      "reason_category": "unreadable_image",
+      "acceptance": "JPEG magic alone does not establish decodable image.",
+      "runtime_result": {
+        "id": "jpeg-truncated",
+        "passed": true,
+        "outcome": "reject",
+        "code": "unreadable_document",
+        "stage": "parser"
+      }
+    },
+    {
+      "id": "png-wrong-magic",
+      "path": "evaluation/fixtures/parser-edges/png-wrong-magic.png",
+      "bytes": 18,
+      "sha256": "a4835d77c2c5b0fe4b5646b832403a86bdb06da088c5d1ae8d751e57d2413126",
+      "declared_mime": "image/png",
+      "expected_outcome": "reject",
+      "reason_category": "mime_mismatch",
+      "acceptance": "Reject before invoking multimodal inference.",
+      "runtime_result": {
+        "id": "png-wrong-magic",
+        "passed": true,
+        "outcome": "reject",
+        "code": "mime_mismatch",
+        "stage": "upload"
+      }
+    }
+  ],
+  "additional_runtime_cases": [
+    "20 MiB + 1 byte upload",
+    "51-page PDF",
+    "10001-row sheet",
+    "21-sheet XLSX",
+    "Expanded archive exceeds limit",
+    "More than 20 EML attachments",
+    "Nested EML beyond allowed depth",
+    "Parser timeout and worker restart"
+  ],
+  "qualified_at": "2026-10-12T15:09:35.984984+02:00",
+  "additional_runtime_results": {
+    "status": "passed",
+    "evidence": "platform/test/parser-limits.test.mjs; worker restart in ingestion/reports tests",
+    "note": "No model inference or monetary normalization measured."
+  }
+}

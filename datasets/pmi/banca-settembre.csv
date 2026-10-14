@@ -1,0 +1,8 @@
+data;id_movimento;descrizione;dare_eur;avere_eur;saldo_eur
+2026-09-01;INC-09;Incasso documentato;0;6000;11000.00
+2026-09-02;AFF-09;Affitto ufficio;1000;0;10000.00
+2026-09-03;SW-A;Cloud A;120;0;9880.00
+2026-09-04;SW-B;Newsletter B;80;0;9800.00
+2026-09-05;EN-09;Energia;180;0;9620.00
+2026-09-06;COL-09;Collaboratore;1200;0;8420.00
+2026-09-07;R-PMI-09;Trasferta;50;0;8370.00

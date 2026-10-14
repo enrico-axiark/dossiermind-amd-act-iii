@@ -1,0 +1,7 @@
+From: demo@example.test
+To: studio@example.test
+Subject: Synthetic remote resource
+MIME-Version: 1.0
+Content-Type: text/html; charset=utf-8
+
+<p>Invoice reference F-DEMO.</p><img src="https://example.invalid/never-fetch">

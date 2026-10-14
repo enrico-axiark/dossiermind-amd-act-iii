@@ -1,0 +1,8 @@
+data;id_movimento;descrizione;dare_eur;avere_eur;saldo_eur
+2026-09-01;INC-09;Incasso documentato;0;2400;3400.00
+2026-09-02;AFF-09;Affitto casa;900;0;2500.00
+2026-09-03;TEL-09;Telefonia;70;0;2430.00
+2026-09-04;ASS-09;Assicurazione;100;0;2330.00
+2026-09-05;EN-09;Energia;80;0;2250.00
+2026-09-06;GYM-09;Palestra;40;0;2210.00
+2026-09-07;R-PRI-09;Ricevuta trasporto;30;0;2180.00
