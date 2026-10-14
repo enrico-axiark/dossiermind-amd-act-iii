@@ -197,6 +197,10 @@ async function reviewDeletion(doc){
  content.append(technicalDetails([['Riepilogo di cancellazione',result.manifestSha256]]));text('pdfTitle',doc.filename);text('pdfKind','Cancellazione del documento e dei contenuti collegati');setModalOriginal();$('pdfPaper').replaceChildren(content);$('pdfModal').classList.add('visible');$('pdfModal').setAttribute('aria-hidden','false');
 }
 async function login(role){
+  if(session.authMode==='competition'){
+    const password=$('competitionPassword').value;$('competitionPassword').value='';const result=await api('/v1/auth/competition',{method:'POST',headers:{'content-type':'application/json','x-demo-login':'1'},body:JSON.stringify({role,profile:$('localProfile').value,password})});
+    session.online=true;session.csrf=result.csrfToken;await enterWorkspace(role);return;
+  }
   if(session.authMode==='oidc'){location.assign('/v1/auth/login');return;}
   if(session.authMode!=='development')throw new Error('Accesso online non ancora configurato.');
   text('loginMessage','Verifico identità e permessi locali…');
@@ -230,6 +234,9 @@ async function upload(files){
 }
 function mime(name){return name.endsWith('.eml')?'message/rfc822':name.endsWith('.xml')?'application/xml':name.endsWith('.csv')?'text/csv':name.endsWith('.xlsx')?'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':'application/octet-stream';}
 async function readyPackage(){
+  if(session.authMode!=='development'){
+    await refresh();for(const doc of session.docs)session.selected.add(doc.id);renderArchive();view('archive');notify(session.docs.length?'Documenti del cliente selezionati.':'Non ci sono documenti da selezionare.');return;
+  }
   const generation=session.generation,tenantId=session.tenant.id;
   const pack=await api(`/v1/tenants/${tenantId}/dev-package`);
   for(const entry of pack.data){
@@ -881,10 +888,12 @@ async function prepareLogin(){
  const response=await fetch('/v1/auth/config',{credentials:'same-origin'});if(!response.ok)throw new Error('Servizio di accesso non disponibile.');
  const config=await response.json();session.authMode=config.mode;
  if(config.mode==='development'){for(const id of ['gateClientLogin','gateAccountantLogin'])$(id).disabled=false;text('loginMessage','Accesso locale di sviluppo; identità sintetiche.');return;}
- $('localProfile').hidden=true;document.querySelector('label[for="localProfile"]').hidden=true;
- for(const id of ['gateClientLogin','gateAccountantLogin'])$(id).disabled=config.mode!=='oidc';
- text('loginMessage',config.mode==='oidc'?'Accedi con la tua identità. I permessi sono verificati dal server.':'Accesso online non ancora configurato.');
- if(config.mode!=='oidc')return;
+ $('localProfile').hidden=config.mode!=='competition';document.querySelector('label[for="localProfile"]').hidden=config.mode!=='competition';
+ $('competitionPasswordField').hidden=config.mode!=='competition';
+ for(const id of ['simulateLoad','selectAllDocs'])text(id,'Seleziona tutti i documenti');
+ for(const id of ['gateClientLogin','gateAccountantLogin'])$(id).disabled=!['oidc','competition'].includes(config.mode);
+ text('loginMessage',config.mode==='competition'?'Demo della competizione: usa la password del profilo scelto. Solo documenti sintetici.':config.mode==='oidc'?'Accedi con la tua identità. I permessi sono verificati dal server.':'Accesso online non ancora configurato.');
+ if(!['oidc','competition'].includes(config.mode))return;
  text('switchIdentity','Esci');
  const status=await fetch('/v1/auth/session',{credentials:'same-origin'});if(status.status===401)return;if(!status.ok)throw new Error('Sessione di accesso non disponibile.');
  const login=await status.json();session.online=true;session.csrf=login.csrfToken;

@@ -6,7 +6,6 @@
 **/*.sqlite*
 **/*.inspect.ndjson
 evaluation
-datasets
 reference-demo
 execution
 provenance

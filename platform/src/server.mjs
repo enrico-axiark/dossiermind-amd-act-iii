@@ -1,9 +1,15 @@
 import { createPlatformApp } from "./app.mjs";
 import { IngestionWorker } from "./ingestion.mjs";
 import { loadConfig } from "./config.mjs";
+import {seedCompetition} from './competition-seed.mjs';
+import {PlatformService} from './service.mjs';
 
 const config = loadConfig();
 const { server, db, advisor, memory } = createPlatformApp(config);
+if(config.competitionSeedEnabled){
+  try{seedCompetition(db,new PlatformService(db,config),config);}
+  catch(error){db.close();console.error({code:error.code||'competition_seed_failed'});process.exit(1);}
+}
 const worker=new IngestionWorker(db,config);
 worker.start();
 let advisorRunning=false;

@@ -3705,7 +3705,7 @@ input:focus-visible {
 }
 
 /* Connected runtime: retain baseline views and visual language. */
-.runtime-note{padding:16px;line-height:1.5;color:#aec0cf}.runtime-row{padding:14px;border:1px solid #334155;border-radius:10px;margin-bottom:10px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}.runtime-row strong{flex:1;overflow-wrap:anywhere}.runtime-source{white-space:pre-wrap;overflow-wrap:anywhere;max-height:55vh;overflow:auto;padding:20px;color:#cbd5e1}#localProfile{padding:12px;margin-top:10px;background:#172a3d;color:white;border:1px solid #526779;border-radius:8px}.runtime-toolbar{display:flex;gap:12px;margin:15px 0}.runtime-row button{padding:8px}button:disabled{opacity:.45;cursor:not-allowed}
+.runtime-note{padding:16px;line-height:1.5;color:#aec0cf}.runtime-row{padding:14px;border:1px solid #334155;border-radius:10px;margin-bottom:10px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}.runtime-row strong{flex:1;overflow-wrap:anywhere}.runtime-source{white-space:pre-wrap;overflow-wrap:anywhere;max-height:55vh;overflow:auto;padding:20px;color:#cbd5e1}#localProfile,#competitionPassword{padding:12px;margin-top:10px;background:#172a3d;color:white;border:1px solid #526779;border-radius:8px}#competitionPasswordField{margin:16px 0}#competitionPassword{display:block;width:min(100%,440px)}.runtime-toolbar{display:flex;gap:12px;margin:15px 0}.runtime-row button{padding:8px}button:disabled{opacity:.45;cursor:not-allowed}
 
 .pdf-modal.open{opacity:1;visibility:visible;pointer-events:auto}.toast.visible{opacity:1;transform:translateY(0);visibility:visible}
 

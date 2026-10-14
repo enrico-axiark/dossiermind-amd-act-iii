@@ -1,4 +1,5 @@
 import {BrowserAuth} from './browser-auth.mjs';
+import {CompetitionAuth} from './competition-auth.mjs';
 import {DocumentMemory} from './document-memory.mjs';
 import {contributionOptions} from './advisor-contributions.mjs';
 import {AdvisorJobs} from './advisor-jobs.mjs';
@@ -87,8 +88,10 @@ function routeMatch(pathname, pattern) {
 }
 
 export function createPlatformApp(config) {
-  const browserAuth = new BrowserAuth(config);
   const db = createDatabase(config.dbPath);
+  let browserAuth;
+  try { browserAuth = config.competitionAccessEnabled ? new CompetitionAuth(config,db) : new BrowserAuth(config); }
+  catch(error){db.close();throw error;}
   const service = new PlatformService(db, config);
   const advisor = new AdvisorJobs(db,config,new AmdRouter(config,{db}));
   const memory=new DocumentMemory(db,config,advisor.gateway);
@@ -134,11 +137,16 @@ export function createPlatformApp(config) {
       }
       if(pathname.startsWith('/v1/auth/')) {
         enforceRateLimit(`browser-auth:${remoteAddress}`,response);
-        if(request.method==='GET'&&pathname==='/v1/auth/config')return sendJson(response,200,{mode:config.allowInsecureDevAuth?'development':browserAuth.enabled?'oidc':'unavailable'});
+        if(request.method==='GET'&&pathname==='/v1/auth/config')return sendJson(response,200,{mode:config.allowInsecureDevAuth?'development':browserAuth.enabled?(config.competitionAccessEnabled?'competition':'oidc'):'unavailable'});
+        if(request.method==='POST'&&pathname==='/v1/auth/competition'&&config.competitionAccessEnabled){
+          const result=await browserAuth.login(request,await readJson(request,2048));response.setHeader('set-cookie',result.cookies);return sendJson(response,200,result.body);
+        }
         if(request.method==='GET'&&pathname==='/v1/auth/login'){
+          assert(!config.competitionAccessEnabled,404,'not_found','Unknown login route');
           const result=await browserAuth.begin(request);response.writeHead(302,{location:result.location,'set-cookie':result.cookies});return response.end();
         }
         if(request.method==='GET'&&pathname==='/v1/auth/callback'){
+          assert(!config.competitionAccessEnabled,404,'not_found','Unknown login route');
           const result=await browserAuth.callbackResult(request,url);response.writeHead(302,{location:result.location,'set-cookie':result.cookies});return response.end();
         }
         if(request.method==='GET'&&pathname==='/v1/auth/session')return sendJson(response,200,await browserAuth.status(request));

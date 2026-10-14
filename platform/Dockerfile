@@ -13,6 +13,7 @@ COPY platform/parsers ./parsers
 COPY platform/openapi ./openapi
 COPY platform/brain ./brain
 COPY app ../app
+COPY datasets ../datasets
 RUN mkdir -p /app/data && chown -R dossiermind:dossiermind /app/data
 USER dossiermind
 ENV NODE_ENV=production HOST=0.0.0.0 PORT=8787 DB_PATH=/app/data/dossiermind.sqlite STORAGE_ROOT=/app/data/objects PYTHON_EXECUTABLE=/opt/parser/bin/python

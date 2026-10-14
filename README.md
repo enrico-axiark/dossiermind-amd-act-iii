@@ -14,7 +14,7 @@ correctness or professional approval.
 
 ## Run locally
 
-Use Node.js 24+, Python 3 and Poppler (`pdftoppm`). Install Python dependencies
+Use Node.js 24+, Python 3.11+ and Poppler (`pdftoppm`). Install Python dependencies
 from `platform/parsers/requirements.txt` in a virtual environment. Set
 `PYTHON_EXECUTABLE` to that environment's Python. From `platform/`, run:
 
@@ -44,13 +44,35 @@ has no stored model responses and requires separately authorized credentials.
 ## Public hosting
 
 Build the supplied `platform/Dockerfile` with the repository root as context.
-`render.yaml` is a deployment candidate with a paid persistent disk, production
-authentication and AMD disabled. It does not provision users or seed data.
-Configure HTTPS OIDC/PKCE, explicitly map user subjects to demo tenants,
-provide distinct 32-byte base64 server encryption/audit secrets and authorize
-the inference budget before exposing the application. Never enable local
-development authentication online. Existing call usage must not be reset by
-creating this clean snapshot. External deployment acceptance is still pending.
+`render.yaml` is a deployment candidate with a paid persistent disk, three
+synthetic competition accounts and AMD disabled. Competition access is an
+explicit opt-in, separate from local development and the existing OIDC/PKCE
+integration. Accounts have separate random passwords, scrypt password hashes,
+expiring secure HttpOnly cookies, CSRF protection and live database permissions.
+They are shared demonstration profiles, not production customer identities.
+
+Generate fresh secrets locally, specifying a private path outside this checkout:
+
+```
+node platform/scripts/prepare-competition-secrets.mjs /private/output/demo.env
+```
+
+Import the environment file only into the hosting service's private environment
+settings. Keep its separate `.passwords.json` file private and supply demo login
+instructions to the intended reviewers. Never commit either file. Render provides
+the HTTPS origin through `RENDER_EXTERNAL_URL`; another host requires an explicit
+`PUBLIC_BASE_URL`. Mount a persistent disk at `/app/data` and retain the distinct
+32-byte base64 encryption/audit keys across all restarts.
+
+`COMPETITION_SEED_SYNTHETIC=true` installs only the 22 hash-verified synthetic
+originals and schedules deterministic parsing on the first start. It does not
+call AMD, fabricate AI results, restore deleted documents or regrant revoked
+memberships on later starts. The seed refuses an unrelated existing archive and
+detects changed persistent encryption/audit keys.
+
+Authorize a hosted inference budget separately before enabling AMD. Existing
+local call usage must not be reset by creating this clean snapshot. Never enable
+development authentication online. External deployment acceptance is pending.
 
 ## Provenance and publication
 

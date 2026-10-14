@@ -1,5 +1,5 @@
 # Deployment candidate: creates paid resources only after review in Render.
-# Existing production OIDC authentication is required; never enable dev auth.
+# Synthetic competition accounts use secure server sessions; never enable dev auth.
 services:
   - type: web
     name: dossiermind-act-iii-demo
@@ -30,21 +30,14 @@ services:
         sync: false
       - key: AUDIT_KEY_B64
         sync: false
-      - key: PUBLIC_BASE_URL
+      - key: COMPETITION_ACCESS_ENABLED
+        value: "true"
+      - key: COMPETITION_SEED_SYNTHETIC
+        value: "true"
+      - key: COMPETITION_ACCOUNTS_JSON
         sync: false
-      - key: ALLOWED_ORIGINS
-        sync: false
-      - key: OIDC_ISSUER
-        sync: false
-      - key: OIDC_CLIENT_ID
-        sync: false
-      - key: OIDC_AUTHORIZATION_URL
-        sync: false
-      - key: OIDC_TOKEN_URL
-        sync: false
-      - key: OIDC_AUDIENCE
-        sync: false
-      # Disabled until cloud identity, seeding and cumulative budget are verified.
+      # PUBLIC_BASE_URL defaults to Render's HTTPS RENDER_EXTERNAL_URL.
+      # Disabled until hosted access and a separately authorized budget are verified.
       - key: AMD_INFERENCE_ENABLED
         value: "false"
       - key: AMD_BUDGET_CONFIRMED

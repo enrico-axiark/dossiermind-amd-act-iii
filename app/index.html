@@ -38,7 +38,7 @@
           <span class="access-node node-c">WORKSPACE</span>
         </div>
 
-        <label for="localProfile">Percorso cliente sintetico</label><select id="localProfile"><option value="pmi">PMI · Aurora Demo SRL</option><option value="privato">Privato · Giulia Demo</option></select><p id="loginMessage" role="status">Accesso locale di sviluppo; OIDC online da configurare.</p><div class="access-choice-grid">
+        <label for="localProfile">Percorso cliente sintetico</label><select id="localProfile"><option value="pmi">PMI · Aurora Demo SRL</option><option value="privato">Privato · Giulia Demo</option></select><div id="competitionPasswordField" hidden><label for="competitionPassword">Password del profilo demo</label><input id="competitionPassword" type="password" autocomplete="current-password" maxlength="256" aria-describedby="loginMessage"></div><p id="loginMessage" role="status">Verifica dell’accesso in corso…</p><div class="access-choice-grid">
           <button class="access-choice access-choice-client" id="gateClientLogin" type="button">
             <span class="access-choice-top"><span class="access-choice-icon" aria-hidden="true">⌂</span><span class="access-choice-tag">PROPRIETARIO</span></span>
             <span class="access-choice-title">Portale Cliente</span>
@@ -57,7 +57,7 @@
         </div>
 
         <div class="access-gate-footer">
-          <span><i class="footer-check" aria-hidden="true">✓</i> Nessuna identità condivisa</span>
+          <span><i class="footer-check" aria-hidden="true">✓</i> Profili sintetici distinti</span>
           <span><i class="footer-check" aria-hidden="true">✓</i> Audit attivo dalla prima azione</span>
           <span id="gateAiRuntimeBadge">Stato AI da verificare</span>
         </div>

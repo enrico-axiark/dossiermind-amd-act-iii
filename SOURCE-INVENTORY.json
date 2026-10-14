@@ -3,8 +3,8 @@
   "files": [
     {
       "path": ".dockerignore",
-      "sha256": "ab067902b45cb21ca6f64cbd84c8d6cd91326b56efc23eb42a515e04d3371bfd",
-      "bytes": 273
+      "sha256": "9f6552009856efa66bdd344bb708b9760c98561508d60362adc013c911be9361",
+      "bytes": 264
     },
     {
       "path": ".gitattributes",
@@ -28,8 +28,8 @@
     },
     {
       "path": "README.md",
-      "sha256": "336eec43bb9a0b511d3f63755cb3896d6581b476d6ef148ad6f5860490b6ca74",
-      "bytes": 3598
+      "sha256": "c34bb48c1e84e1aa1dd891b2969fa044271a0079e17deffac2ad5e3c1812a361",
+      "bytes": 4766
     },
     {
       "path": "THIRD-PARTY-NOTICES.md",
@@ -38,18 +38,18 @@
     },
     {
       "path": "app/index.html",
-      "sha256": "a6851a834b051f931c8911afa464c606f3a17ef8ccf80703d83505a48e8427ab",
-      "bytes": 39137
+      "sha256": "611459df788a8226ab4ba2b9ffb55cc92dc8fc2480b68fb866cb04d9f9b2f490",
+      "bytes": 39358
     },
     {
       "path": "app/runtime.js",
-      "sha256": "46a495daedadafc1f5ab98afa76688a98ceb43b045294a63dea0c5659a3e67c3",
-      "bytes": 147843
+      "sha256": "90adf31d8427eeed87354072cec3b9cd9af67f7d7f1390db66bd82f8e8ca3986",
+      "bytes": 148894
     },
     {
       "path": "app/styles.css",
-      "sha256": "f240b80f4d715c4d9a86179aaa7dd04693f7efd6beb9a62f64b70999c0d735f1",
-      "bytes": 2936009
+      "sha256": "6c6046fab6fbe79b9d92dc6244b3fad6ae6ecb32eb7314c755536ff38c302372",
+      "bytes": 2936127
     },
     {
       "path": "datasets/collaudo-rapido-2026-10-14/collaudo-finale-pmi.eml",
@@ -258,8 +258,8 @@
     },
     {
       "path": "platform/Dockerfile",
-      "sha256": "b7248e94e8f50eb88dcaee72940ea278e2b44ed6af77af4ae971ed2a28913cc8",
-      "bytes": 980
+      "sha256": "a37cdacc765c9bc4cd6331a0b0a79e76ca5c854415ea03e033d876f1b08ad602",
+      "bytes": 1006
     },
     {
       "path": "platform/brain/brain-contract.v1.json",
@@ -342,6 +342,11 @@
       "bytes": 1913
     },
     {
+      "path": "platform/scripts/prepare-competition-secrets.mjs",
+      "sha256": "18537acbe2bd1580ec8dd014f9040e2d396dfff3eaaf9d86f5d7e5e10cdf3ef7",
+      "bytes": 2033
+    },
+    {
       "path": "platform/scripts/run-local.mjs",
       "sha256": "89dffe486198eddf16fb1cc75974bc6fcfd8b9136516499ff1a4653abe1694d3",
       "bytes": 2990
@@ -383,8 +388,8 @@
     },
     {
       "path": "platform/src/app.mjs",
-      "sha256": "4713f6a3af74f870aa9d39befc029af3f36a33036e05ed7ae86e8d8abb3ee176",
-      "bytes": 27996
+      "sha256": "8455b5536912b3e14451537fc3cbdebe3bb6b13b37938ccf37270db06b716047",
+      "bytes": 28699
     },
     {
       "path": "platform/src/assertions.mjs",
@@ -422,9 +427,19 @@
       "bytes": 10563
     },
     {
+      "path": "platform/src/competition-auth.mjs",
+      "sha256": "4be46d215147975361b2fafc43e2703ec32b49eeb019418348ea04df457cebe3",
+      "bytes": 6275
+    },
+    {
+      "path": "platform/src/competition-seed.mjs",
+      "sha256": "b42a8ffc49b5087875283ea3d3d37e04a506640e96dc566590a266b3e32f9bf4",
+      "bytes": 4777
+    },
+    {
       "path": "platform/src/config.mjs",
-      "sha256": "bf4414ea755c112a17efefbb751cbb2247b59929998994745fe60da120aa263c",
-      "bytes": 5324
+      "sha256": "b1c2a9ce2e7821764f0c066910ccb332ef690a758da80d5d69637f67303a2e6e",
+      "bytes": 5694
     },
     {
       "path": "platform/src/consents.mjs",
@@ -523,8 +538,8 @@
     },
     {
       "path": "platform/src/server.mjs",
-      "sha256": "d22128426f6c811e571bdc64404aa9850fdb482d0df303662cc58e1986928b60",
-      "bytes": 1312
+      "sha256": "4f8949361af1cfc611a58e569103184d531ff8196232f7aaa6b618a40109832c",
+      "bytes": 1622
     },
     {
       "path": "platform/src/service.mjs",
@@ -595,6 +610,11 @@
       "path": "platform/test/checklists.test.mjs",
       "sha256": "29d08b2be2d7eb3e5f946230a5a0c5e562d19d2b6300958c6d368decf0f12e8d",
       "bytes": 15811
+    },
+    {
+      "path": "platform/test/competition-access.test.mjs",
+      "sha256": "021f14b36543bfe0933047ddbf5c4d9c8097983785b35e44ce2fb1ed3d86f7e0",
+      "bytes": 10269
     },
     {
       "path": "platform/test/consents.test.mjs",
@@ -668,8 +688,8 @@
     },
     {
       "path": "render.yaml",
-      "sha256": "33d06a023633309ffb0e7f0c9cebc594f7d1845cc9a2078b5fe34e6728f6ceab",
-      "bytes": 2032
+      "sha256": "db65db3a73e6c7263c819b45ac265cf585fd97ba6fd5bcdd4451f9daa837e68d",
+      "bytes": 1954
     },
     {
       "path": "scripts/prepare-parser-edge-fixtures.py",
@@ -681,6 +701,6 @@
   "private_materials_included": false,
   "old_git_history_included": false,
   "publication": true,
-  "qualification": "review-02 runtime/test source passed 137 tests; release changes license/notices, provenance/footer text, byte-preservation attributes and package launch instructions",
+  "qualification": "Base review-02 passed 137 tests. Hosted competition access passed five security/seed tests; updated local suite: 141/142 passed, one PDF visual preprocessing test blocked by missing local Poppler. Docker installs Poppler; hosted acceptance remains pending. No live AMD calls during these tests.",
   "public_repository": "https://github.com/enrico-axiark/dossiermind-amd-act-iii"
 }
