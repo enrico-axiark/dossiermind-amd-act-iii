@@ -1,0 +1,37 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://dossiermind.local/schemas/source-object.v1.json",
+  "title": "DossierMind Source Object",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id", "tenant_id", "version", "content_hash", "storage_ref", "media_type",
+    "origin", "received_at", "security_state", "retention_policy_id"
+  ],
+  "properties": {
+    "id": { "type": "string", "minLength": 1 },
+    "tenant_id": { "type": "string", "minLength": 1 },
+    "version": { "type": "integer", "minimum": 1 },
+    "content_hash": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "storage_ref": { "type": "string", "minLength": 1 },
+    "media_type": { "type": "string", "minLength": 1 },
+    "detected_media_type": { "type": ["string", "null"] },
+    "size_bytes": { "type": "integer", "minimum": 0 },
+    "origin": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["channel", "actor_id"],
+      "properties": {
+        "channel": { "enum": ["upload", "partner_connector", "studio_contribution", "system_import"] },
+        "actor_id": { "type": "string", "minLength": 1 },
+        "external_id": { "type": ["string", "null"] },
+        "correlation_id": { "type": ["string", "null"] }
+      }
+    },
+    "received_at": { "type": "string", "format": "date-time" },
+    "security_state": { "enum": ["quarantined", "clean", "rejected", "unknown"] },
+    "retention_policy_id": { "type": "string", "minLength": 1 },
+    "legal_hold": { "type": "boolean", "default": false },
+    "status": { "enum": ["active", "superseded", "revoked", "deletion_pending", "deleted"] }
+  }
+}

@@ -1,0 +1,203 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://dossiermind.local/schemas/knowledge-assertion.v1.1.json",
+  "title": "DossierMind Knowledge Assertion 1.1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "tenant_id",
+    "assertion_type",
+    "subject_ref",
+    "value",
+    "status",
+    "confidence",
+    "evidence",
+    "origin",
+    "contract_version",
+    "created_at",
+    "review_status",
+    "confidence_basis"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "tenant_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "assertion_type": {
+      "type": "string",
+      "minLength": 1
+    },
+    "subject_ref": {
+      "type": "string",
+      "minLength": 1
+    },
+    "predicate": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "object_ref": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "value": {},
+    "valid_from": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time"
+    },
+    "valid_to": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time"
+    },
+    "status": {
+      "enum": [
+        "proposed",
+        "verified",
+        "rejected",
+        "superseded",
+        "conflicted"
+      ]
+    },
+    "confidence": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "minimum": 0,
+      "maximum": 1
+    },
+    "evidence": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "source_object_id",
+          "document_version_id",
+          "fragment_id",
+          "lineage_id"
+        ],
+        "properties": {
+          "source_object_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "document_version_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "fragment_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "lineage_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "page": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 1
+          },
+          "start_offset": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 0
+          },
+          "end_offset": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 0
+          }
+        }
+      }
+    },
+    "origin": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "component",
+        "component_version"
+      ],
+      "properties": {
+        "kind": {
+          "enum": [
+            "deterministic_parser",
+            "model",
+            "human"
+          ]
+        },
+        "component": {
+          "type": "string",
+          "minLength": 1
+        },
+        "component_version": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "contract_version": {
+      "const": "1.1.0"
+    },
+    "policy_version": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "review_status": {
+      "enum": [
+        "not_required",
+        "pending",
+        "approved",
+        "rejected"
+      ]
+    },
+    "supersedes_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "conflicts_with": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true
+    },
+    "confidence_basis": {
+      "enum": [
+        "not_measured",
+        "evaluated"
+      ]
+    }
+  }
+}

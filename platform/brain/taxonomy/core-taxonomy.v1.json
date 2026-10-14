@@ -1,0 +1,33 @@
+{
+  "taxonomyId": "dossiermind.core",
+  "taxonomyVersion": "1.0.0",
+  "status": "bootstrap",
+  "extensionPolicy": "tenant-extensions-require-namespace-and-version",
+  "documentTypes": [
+    "invoice", "credit_note", "bank_statement", "payment_receipt", "tax_form",
+    "contract", "certified_email", "ordinary_email", "spreadsheet", "professional_report", "other"
+  ],
+  "entityTypes": [
+    "organization", "person", "account", "contract", "obligation", "transaction",
+    "document", "communication", "period", "project", "system"
+  ],
+  "assertionTypes": [
+    "identifier", "amount", "date", "period", "status", "ownership", "obligation",
+    "deadline", "payment", "reconciliation", "classification", "contact", "open_question"
+  ],
+  "relationTypes": [
+    "refers_to", "issued_by", "received_by", "belongs_to_period", "supports",
+    "contradicts", "supersedes", "settles", "relates_to", "requires_review",
+    "produced_by", "authorized_for"
+  ],
+  "sensitivityClasses": ["public", "internal", "confidential", "personal", "special_category"],
+  "reviewStates": ["not_required", "pending", "approved", "rejected"],
+  "knowledgeStates": ["proposed", "verified", "rejected", "superseded", "conflicted"],
+  "reservedPrefixes": ["dm", "tenant", "partner"],
+  "rules": [
+    "New domain values must use a namespace and a semantic version.",
+    "A taxonomy label does not imply professional correctness.",
+    "Removing a value requires an explicit migration and impact analysis.",
+    "Tenant extensions cannot weaken global security, provenance or review rules."
+  ]
+}

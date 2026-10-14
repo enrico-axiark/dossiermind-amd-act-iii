@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://dossiermind.local/schemas/processing-event.v1.json",
+  "title": "DossierMind Brain Processing Event",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id", "tenant_id", "job_id", "correlation_id", "event_type", "from_state",
+    "to_state", "component", "component_version", "contract_version", "occurred_at", "outcome"
+  ],
+  "properties": {
+    "id": { "type": "string", "minLength": 1 },
+    "tenant_id": { "type": "string", "minLength": 1 },
+    "job_id": { "type": "string", "minLength": 1 },
+    "correlation_id": { "type": "string", "minLength": 1 },
+    "event_type": { "type": "string", "minLength": 1 },
+    "from_state": { "type": ["string", "null"] },
+    "to_state": { "type": "string", "minLength": 1 },
+    "component": { "type": "string", "minLength": 1 },
+    "component_version": { "type": "string", "minLength": 1 },
+    "contract_version": { "type": "string", "minLength": 1 },
+    "input_hash": { "type": ["string", "null"], "pattern": "^[a-f0-9]{64}$" },
+    "output_hash": { "type": ["string", "null"], "pattern": "^[a-f0-9]{64}$" },
+    "attempt": { "type": "integer", "minimum": 1 },
+    "occurred_at": { "type": "string", "format": "date-time" },
+    "outcome": { "enum": ["success", "retry", "failure", "rejected", "blocked"] },
+    "error_code": { "type": ["string", "null"] },
+    "metrics": { "type": "object", "additionalProperties": { "type": ["number", "integer", "string", "boolean", "null"] } }
+  }
+}

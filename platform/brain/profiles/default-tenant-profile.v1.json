@@ -1,0 +1,39 @@
+{
+  "profile_version": "1.0.0",
+  "contract_version": "1.0.0",
+  "tenant_id": "replace-at-bootstrap",
+  "locale": "it-IT",
+  "timezone": "Europe/Rome",
+  "region": "EU-to-be-selected",
+  "taxonomy_version": "1.0.0",
+  "enabled_document_types": [
+    "invoice", "credit_note", "bank_statement", "payment_receipt", "tax_form",
+    "contract", "certified_email", "ordinary_email", "spreadsheet", "professional_report", "other"
+  ],
+  "autonomy": {
+    "auto_publish_deterministic": true,
+    "model_assertion_review_threshold": 0.85,
+    "professional_outputs_require_approval": true
+  },
+  "review": {
+    "allowed_roles": ["tenant_owner", "authorized_professional"],
+    "conflicts_require_review": true,
+    "entity_merge_requires_review": true
+  },
+  "providers": {
+    "training_allowed": false,
+    "retention": "contract-and-region-required-before-use",
+    "adapter_ids": {
+      "ocr": null,
+      "classification": null,
+      "knowledge_extraction": null,
+      "embedding": null,
+      "answering": null
+    }
+  },
+  "retention": {
+    "policy_id": "replace-with-approved-policy",
+    "legal_hold_supported": true
+  },
+  "connectors": []
+}

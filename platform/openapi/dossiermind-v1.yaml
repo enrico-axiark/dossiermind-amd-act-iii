@@ -1,0 +1,1460 @@
+openapi: 3.1.1
+info:
+  title: DossierMind Partner API
+  version: 1.0.0-alpha.3
+  description: >-
+    API headless multi-tenant per integrare DossierMind in applicazioni dirette,
+    gestionali contabili, white-label e deployment dedicati.
+servers:
+  - url: https://api.dossiermind.example/v1
+    description: Production placeholder
+  - url: http://127.0.0.1:8787/v1
+    description: Local development
+security:
+  - oidc: []
+tags:
+  - name: Identity
+  - name: Platform administration
+  - name: Tenants
+  - name: Documents
+  - name: Jobs
+  - name: Audit
+  - name: Privacy
+  - name: Webhooks
+  - name: Integrations
+paths:
+  /tenants/{tenantId}/ai/status:
+    get:
+      tags: [Tenants]
+      operationId: getTenantAiStatus
+      description: Configuration and persisted client job state only, never model quality or GPU proof. Requires live documents:read; contains no endpoint, key or other-client job details.
+      parameters:
+        - {name: tenantId, in: path, required: true, schema: {type: string, format: uuid}}
+      responses:
+        "200":
+          description: Authorized client AI state; no inference is dispatched
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    additionalProperties: false
+                    required: [state, configured, visionConfigured, counts, requiresHumanReview, configurationIsQualityProof]
+                    properties:
+                      state: {type: string, enum: [not_configured, configured, queued, working, needs_check, limit_reached]}
+                      configured: {type: boolean}
+                      visionConfigured: {type: boolean}
+                      requiresHumanReview: {type: boolean, const: true}
+                      configurationIsQualityProof: {type: boolean, const: false}
+                      counts:
+                        type: object
+                        properties:
+                          queued: {type: integer, minimum: 0}
+                          running: {type: integer, minimum: 0}
+                          completed: {type: integer, minimum: 0}
+                          failed: {type: integer, minimum: 0}
+                          uncertain: {type: integer, minimum: 0}
+        "401": {description: Authentication required}
+        "403": {description: No live document read permission for this client}
+  /me:
+    get:
+      tags: [Identity]
+      operationId: getCurrentPrincipal
+      responses:
+        "200":
+          description: Authenticated principal
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Principal" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+  /me/tenants:
+    get:
+      tags: [Identity]
+      operationId: listAuthorizedTenants
+      responses:
+        "200":
+          description: Active clients authorized by live database membership
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id: {type: string}
+                        name: {type: string}
+                        role: {type: string}
+                        scopes: {type: array, items: {type: string}}
+  /tenants/{tenantId}/documents/{documentId}/fragments:
+    get:
+      tags: [Documents]
+      operationId: getAuthorizedDocumentFragments
+      security: [{oidc: ["documents:read"]}]
+      parameters:
+        - {$ref: "#/components/parameters/TenantId"}
+        - name: documentId
+          in: path
+          required: true
+          schema: {type: string}
+      responses:
+        "200":
+          description: Deterministic extraction with source hash, locators and warnings; no AI inference
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  documentId: {type: string}
+                  sourceHash: {type: string}
+                  status: {type: string, enum: [not_processed, extracted, needs_vision]}
+                  fragments:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id: {type: string}
+                        text: {type: string}
+                        locator: {type: object}
+                  warnings: {type: array, items: {type: object}}
+        "403": {$ref: "#/components/responses/Forbidden"}
+        "404": {$ref: "#/components/responses/NotFound"}
+  /admin/organizations:
+    post:
+      tags: [Platform administration]
+      operationId: createOrganization
+      security: [{ oidc: ["platform:admin"] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/OrganizationCreate" }
+      responses:
+        "201":
+          description: Organization created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Organization" }
+  /admin/users:
+    post:
+      tags: [Platform administration]
+      operationId: createUser
+      security: [{ oidc: ["platform:admin"] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/UserCreate" }
+      responses:
+        "201":
+          description: User created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/User" }
+  /admin/tenants:
+    post:
+      tags: [Platform administration]
+      operationId: createTenant
+      security: [{ oidc: ["platform:admin"] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/TenantCreate" }
+      responses:
+        "201":
+          description: Tenant created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Tenant" }
+  /admin/tenants/{tenantId}/memberships:
+    put:
+      tags: [Platform administration]
+      operationId: upsertMembership
+      security: [{ oidc: ["platform:admin"] }]
+      parameters: [{ $ref: "#/components/parameters/TenantId" }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/MembershipUpsert" }
+      responses:
+        "200":
+          description: Membership created or updated
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Membership" }
+  /admin/partner-clients:
+    post:
+      tags: [Platform administration]
+      operationId: createPartnerClient
+      security: [{ oidc: ["platform:admin"] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [organizationId, name]
+              properties:
+                organizationId: { type: string, format: uuid }
+                name: { type: string }
+      responses:
+        "201": { description: Partner OAuth client registered }
+  /admin/partner-clients/{partnerClientId}/tenants/{tenantId}:
+    put:
+      tags: [Platform administration]
+      operationId: grantPartnerTenant
+      security: [{ oidc: ["platform:admin"] }]
+      parameters:
+        - { name: partnerClientId, in: path, required: true, schema: { type: string, format: uuid } }
+        - { $ref: "#/components/parameters/TenantId" }
+      responses:
+        "200": { description: Partner explicitly authorized for tenant }
+  /admin/retention/enforce:
+    post:
+      tags: [Platform administration]
+      operationId: enforceRetention
+      security: [{ oidc: ["platform:admin"] }]
+      responses:
+        "200": { description: Retention enforcement summary }
+  /tenants/{tenantId}:
+    get:
+      tags: [Tenants]
+      operationId: getTenant
+      security: [{ oidc: ["tenant:read"] }]
+      parameters: [{ $ref: "#/components/parameters/TenantId" }]
+      responses:
+        "200":
+          description: Tenant
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Tenant" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+  /tenants/{tenantId}/documents:
+    get:
+      tags: [Documents]
+      operationId: listDocuments
+      security: [{ oidc: ["documents:read"] }]
+      parameters: [{ $ref: "#/components/parameters/TenantId" }]
+      responses:
+        "200":
+          description: Documents
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: array
+                    items: { $ref: "#/components/schemas/Document" }
+    post:
+      tags: [Documents]
+      operationId: uploadDocument
+      description: >-
+        Carica il documento come corpo binario. Il tenant e' autorizzato dal token e dalla
+        membership; il nome file e' passato in X-Filename. In produzione puo' essere
+        affiancato da upload URL firmati per file grandi.
+      security: [{ oidc: ["documents:write"] }]
+      parameters:
+        - $ref: "#/components/parameters/TenantId"
+        - name: X-Filename
+          in: header
+          required: true
+          schema: { type: string, maxLength: 255 }
+        - name: Idempotency-Key
+          in: header
+          required: false
+          schema: { type: string, maxLength: 128 }
+      requestBody:
+        required: true
+        content:
+          application/pdf: { schema: { type: string, format: binary } }
+          application/xml: { schema: { type: string, format: binary } }
+          application/octet-stream: { schema: { type: string, format: binary } }
+      responses:
+        "201":
+          description: Encrypted document stored
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Document" }
+        "409": { $ref: "#/components/responses/Conflict" }
+        "413": { $ref: "#/components/responses/TooLarge" }
+  /tenants/{tenantId}/documents/{documentId}/deletion-manifest:
+    get:
+      tags: [Documents]
+      operationId: previewDocumentDeletion
+      security: [{ oidc: ["documents:delete"] }]
+      parameters:
+        - $ref: "#/components/parameters/TenantId"
+        - $ref: "#/components/parameters/DocumentId"
+      responses:
+        "200":
+          description: "Original and full linked derivative/revision closure, hold state and manifestSha256. IDs/counts only, no bodies. Audit, tombstone and technical job/dispatch history remain; downloads/backups outside scope."
+          content:
+            application/json:
+              schema: { type: object, additionalProperties: true }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+  /tenants/{tenantId}/documents/{documentId}:
+    get:
+      tags: [Documents]
+      operationId: downloadDocument
+      security: [{ oidc: ["documents:read"] }]
+      parameters:
+        - $ref: "#/components/parameters/TenantId"
+        - $ref: "#/components/parameters/DocumentId"
+      responses:
+        "200":
+          description: Decrypted document
+          headers:
+            X-Document-Sha256: { schema: { type: string } }
+          content:
+            application/octet-stream: { schema: { type: string, format: binary } }
+        "404": { $ref: "#/components/responses/NotFound" }
+    delete:
+      tags: [Documents]
+      operationId: deleteDocument
+      security: [{ oidc: ["documents:delete"] }]
+      parameters:
+        - $ref: "#/components/parameters/TenantId"
+        - $ref: "#/components/parameters/DocumentId"
+        - name: X-Deletion-Manifest
+          in: header
+          required: true
+          description: "manifestSha256 returned by current deletion preview."
+          schema: { type: string, pattern: "^[a-f0-9]{64}$" }
+      responses:
+        "200":
+          description: Original and linked derivatives removed from this archive; minimal metadata tombstoned. Includes removed closure and manifest hash.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [id, deletedAt]
+                properties:
+                  id: { type: string, format: uuid }
+                  deletedAt: { type: string, format: date-time }
+                  manifestSha256: { type: string }
+                  removed: { type: object, additionalProperties: true }
+        "400": { description: Current deletion preview required }
+        "409": { description: Active legal hold or changed deletion manifest }
+  /tenants/{tenantId}/jobs:
+    post:
+      tags: [Jobs]
+      operationId: createJob
+      security: [{ oidc: ["jobs:write"] }]
+      parameters: [{ $ref: "#/components/parameters/TenantId" }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [type]
+              properties:
+                type: { type: string, enum: [ingestion, report] }
+                input:
+                  type: object
+                  additionalProperties: true
+                  description: "ingestion requires documentIds; report requires an available kind. document_dossier covers the archive. pmi_period_dossier and private_period_summary require periodStart/periodEnd (ISO dates), distinct documentIds from the active client and confirmPeriodSelection=true. Period selection does not validate internal document dates or combine financial amounts. pmi_missing_documents, private_missing_documents, pmi_studio_brief and private_professional_brief require checklistId from the same client. private_spend_receipts and pmi_bank_reconciliation require periodStart/periodEnd, confirmPeriodSelection=true and table with documentId, sheet for XLSX, firstRow/lastRow, distinct columns id/description/amount, currency EUR, numberFormat decimal-dot or decimal-comma, confirmTableScope=true. PMI additionally requires bankCalculationId from a current saved result on another document; matches are candidates, not payment proof. Snapshot is frozen on queue."
+      responses:
+        "202":
+          description: Job queued
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Job" }
+  /tenants/{tenantId}/jobs/{jobId}:
+    get:
+      tags: [Jobs]
+      operationId: getJob
+      security: [{ oidc: ["jobs:read"] }]
+      parameters:
+        - $ref: "#/components/parameters/TenantId"
+        - name: jobId
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        "200":
+          description: Job status
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Job" }
+  /tenants/{tenantId}/audit:
+    get:
+      tags: [Audit]
+      operationId: listAudit
+      security: [{ oidc: ["audit:read"] }]
+      parameters:
+        - $ref: "#/components/parameters/TenantId"
+        - name: limit
+          in: query
+          schema: { type: integer, minimum: 1, maximum: 1000, default: 100 }
+      responses:
+        "200":
+          description: Audit events and chain validation result
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [validChain, events]
+                properties:
+                  validChain: { type: boolean }
+                  events:
+                    type: array
+                    items: { $ref: "#/components/schemas/AuditEvent" }
+  /tenants/{tenantId}/privacy/export:
+    post:
+      tags: [Privacy]
+      operationId: exportTenant
+      security: [{ oidc: ["privacy:export"] }]
+      parameters: [{ $ref: "#/components/parameters/TenantId" }]
+      responses:
+        "200":
+          description: Portable tenant manifest
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/PrivacyExport" }
+  /tenants/{tenantId}/privacy/erase:
+    post:
+      tags: [Privacy]
+      operationId: eraseTenant
+      security: [{ oidc: ["privacy:erase"] }]
+      parameters: [{ $ref: "#/components/parameters/TenantId" }]
+      responses:
+        "200":
+          description: Erasure receipt
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErasureReceipt" }
+        "409":
+          description: Active legal hold or tenant state conflict
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorEnvelope" }
+  /tenants/{tenantId}/privacy/retention:
+    put:
+      tags: [Privacy]
+      operationId: setRetention
+      security: [{ oidc: ["privacy:manage"] }]
+      parameters: [{ $ref: "#/components/parameters/TenantId" }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [retentionDays]
+              properties:
+                retentionDays: { type: integer, minimum: 1, maximum: 3650 }
+      responses:
+        "200":
+          description: Retention policy updated
+  /tenants/{tenantId}/privacy/legal-holds:
+    post:
+      tags: [Privacy]
+      operationId: createLegalHold
+      security: [{ oidc: ["privacy:legal_hold"] }]
+      parameters: [{ $ref: "#/components/parameters/TenantId" }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [reason]
+              properties:
+                reason: { type: string, minLength: 1, maxLength: 500 }
+      responses:
+        "201":
+          description: Legal hold created
+  /tenants/{tenantId}/webhooks:
+    post:
+      tags: [Webhooks]
+      operationId: registerWebhook
+      security: [{ oidc: ["webhooks:manage"] }]
+      parameters: [{ $ref: "#/components/parameters/TenantId" }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [url, eventTypes]
+              properties:
+                url: { type: string, format: uri, pattern: "^https://" }
+                eventTypes:
+                  type: array
+                  minItems: 1
+                  items: { type: string }
+      responses:
+        "201":
+          description: Webhook registered; secret is returned only once
+  /tenants/{tenantId}/integrations/mappings:
+    put:
+      tags: [Integrations]
+      operationId: upsertExternalMapping
+      security: [{ oidc: ["integrations:write"] }]
+      parameters: [{ $ref: "#/components/parameters/TenantId" }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ExternalMapping" }
+      responses:
+        "200": { description: External identifier mapped to DossierMind resource }
+    get:
+      tags: [Integrations]
+      operationId: getExternalMapping
+      security: [{ oidc: ["integrations:read"] }]
+      parameters:
+        - $ref: "#/components/parameters/TenantId"
+        - { name: partnerClientId, in: query, required: true, schema: { type: string, format: uuid } }
+        - { name: resourceType, in: query, required: true, schema: { type: string } }
+        - { name: externalId, in: query, required: true, schema: { type: string } }
+      responses:
+        "200":
+          description: External mapping
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ExternalMapping" }
+  /me/consents:
+    get:
+      summary: Own collaboration requests and historical access states
+      responses:
+        '200':
+          description: Requests for the authenticated user; no document content
+  /tenants/{tenantId}/consents:
+    parameters:
+      - name: tenantId
+        in: path
+        required: true
+        schema: { type: string }
+    get:
+      summary: Owner-only list of studio access requests
+      responses:
+        '200': { description: Current requests and access decisions }
+        '403': { description: Active owner membership required }
+    post:
+      summary: Request access without granting any permission
+      responses:
+        '201': { description: Pending request or existing access state }
+        '403': { description: Registered active user required }
+  /tenants/{tenantId}/consents/{consentId}:
+    parameters:
+      - name: tenantId
+        in: path
+        required: true
+        schema: { type: string }
+      - name: consentId
+        in: path
+        required: true
+        schema: { type: string }
+    put:
+      summary: Owner approval, rejection or immediate revocation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [action]
+              properties:
+                action: { type: string, enum: [approve, revoke, reject] }
+                scopes:
+                  type: array
+                  items:
+                    type: string
+                    enum: ['tenant:read', 'documents:read', 'documents:write', 'jobs:read', 'jobs:write', 'audit:read']
+      responses:
+        '200': { description: Decision persisted with audit and access epoch update }
+        '400': { description: Invalid action or unsafe permission scope }
+        '403': { description: Active owner membership required }
+        '404': { description: Request outside this tenant or not found }
+        '409': { description: Invalid state transition }
+  /tenants/{tenantId}/brain/search:
+    get:
+      summary: Search current client fragments by lexical relevance
+      description: Original fragments in data, conditional calculations in derived and attributed human statements in humanContributions and latest linked notes in sharedNotes remain separate. Shared notes require all referenced fragments and source hashes to remain current; they are not verified facts. Human statements are not independent evidence; stale and rejected statements are excluded from search. Possible exact-context differences remain visible. Ranking is not confidence.
+      parameters:
+        - $ref: "#/components/parameters/TenantId"
+        - name: q
+          in: query
+          required: true
+          schema: { type: string, minLength: 2, maxLength: 500 }
+      responses:
+        '200':
+          description: Successful scoped result
+          content:
+            application/json:
+              schema: { type: object }
+        '400': { description: Invalid input or unavailable citation }
+        '403': { description: Live permission required }
+        '404': { description: Resource unavailable within this client }
+        '409': { description: Stale revision or input state }
+  /tenants/{tenantId}/brain/graph:
+    get:
+      summary: Get current document provenance graph
+      parameters:
+        - $ref: "#/components/parameters/TenantId"
+      responses:
+        '200':
+          description: Successful scoped result
+          content:
+            application/json:
+              schema: { type: object }
+        '400': { description: Invalid input or unavailable citation }
+        '403': { description: Live permission required }
+        '404': { description: Resource unavailable within this client }
+        '409': { description: Stale revision or input state }
+  /tenants/{tenantId}/brain/notes:
+    get:
+      summary: List latest encrypted human contributions
+      parameters:
+        - $ref: "#/components/parameters/TenantId"
+      responses:
+        '200':
+          description: Successful scoped result
+          content:
+            application/json:
+              schema: { type: object }
+        '400': { description: Invalid input or unavailable citation }
+        '403': { description: Live permission required }
+        '404': { description: Resource unavailable within this client }
+        '409': { description: Stale revision or input state }
+    post:
+      summary: Create sourced human note
+      parameters:
+        - $ref: "#/components/parameters/TenantId"
+      description: Requires live documents read and write permissions. Citations are verified against this client. Human text is not automatically a verified fact.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [title, text, references]
+              properties:
+                title: { type: string, minLength: 1, maxLength: 160 }
+                text: { type: string, minLength: 1, maxLength: 10000 }
+                expectedVersion: { type: integer, minimum: 0 }
+                references:
+                  type: array
+                  minItems: 1
+                  maxItems: 10
+                  items:
+                    type: object
+                    required: [documentId, fragmentId]
+                    properties:
+                      documentId: { type: string }
+                      fragmentId: { type: string }
+      responses:
+        '201':
+          description: Successful scoped result
+          content:
+            application/json:
+              schema: { type: object }
+        '400': { description: Invalid input or unavailable citation }
+        '403': { description: Live permission required }
+        '404': { description: Resource unavailable within this client }
+        '409': { description: Stale revision or input state }
+  /tenants/{tenantId}/brain/notes/{noteId}:
+    get:
+      summary: Read attributed note revision history
+      parameters:
+        - $ref: "#/components/parameters/TenantId"
+        - name: noteId
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: Successful scoped result
+          content:
+            application/json:
+              schema: { type: object }
+        '400': { description: Invalid input or unavailable citation }
+        '403': { description: Live permission required }
+        '404': { description: Resource unavailable within this client }
+        '409': { description: Stale revision or input state }
+    put:
+      summary: Save revision with optimistic concurrency
+      parameters:
+        - $ref: "#/components/parameters/TenantId"
+        - name: noteId
+          in: path
+          required: true
+          schema: { type: string }
+      description: Requires live documents read and write permissions. Citations are verified against this client. Human text is not automatically a verified fact.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [title, text, references, expectedVersion]
+              properties:
+                title: { type: string, minLength: 1, maxLength: 160 }
+                text: { type: string, minLength: 1, maxLength: 10000 }
+                expectedVersion: { type: integer, minimum: 0 }
+                references:
+                  type: array
+                  minItems: 1
+                  maxItems: 10
+                  items:
+                    type: object
+                    required: [documentId, fragmentId]
+                    properties:
+                      documentId: { type: string }
+                      fragmentId: { type: string }
+      responses:
+        '200':
+          description: Successful scoped result
+          content:
+            application/json:
+              schema: { type: object }
+        '400': { description: Invalid input or unavailable citation }
+        '403': { description: Live permission required }
+        '404': { description: Resource unavailable within this client }
+        '409': { description: Stale revision or input state }
+  /tenants/{tenantId}/advisor/evidence:
+    parameters:
+      - $ref: "#/components/parameters/TenantId"
+    post:
+      summary: Preview authorized original passages for a question; no AI answer
+      description: Lexical source preview only. Requires documents read permission. Returned hashes are verification details, ranking is not confidence; original passages may be incomplete or irrelevant. No model call or business conclusion. Audit records count/method without question content.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [question]
+              properties:
+                question: { type: string, minLength: 2, maxLength: 500 }
+      responses:
+        "200":
+          description: Source preview with evidence references, limitations, answer null and aiExecuted false
+        "400":
+          description: Invalid question or extra parameters
+        "403":
+          description: Client access unavailable or revoked
+        "409":
+          description: Source changed or unavailable
+  /tenants/{tenantId}/reports:
+    get:
+      summary: List generated document dossiers
+      parameters:
+        - $ref: "#/components/parameters/TenantId"
+      responses:
+        '200':
+          description: Successful scoped result
+          content:
+            application/json:
+              schema: { type: object }
+        '400': { description: Invalid input or unavailable citation }
+        '403': { description: Live permission required }
+        '404': { description: Resource unavailable within this client }
+        '409': { description: Stale revision or input state }
+  /tenants/{tenantId}/reports/{reportId}:
+    get:
+      summary: Download encrypted source-linked dossier PDF
+      parameters:
+        - $ref: "#/components/parameters/TenantId"
+        - name: reportId
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: Successful scoped result
+          content:
+            application/pdf:
+              schema: { type: string, format: binary }
+        '400': { description: Invalid input or unavailable citation }
+        '403': { description: Live permission required }
+        '404': { description: Resource unavailable within this client }
+        '409': { description: Stale revision or input state }
+  /tenants/{tenantId}/brain/calculations/bank-summary:
+    post:
+      summary: Compute CSV movement totals and balance consistency with exact integer cents
+      description: Requires live documents read permission and explicit column mapping, numeric convention and after-transaction balance semantics. Duplicate IDs or invalid dates/amounts block totals. Opening is reconstructed from first row; this does not reconcile invoices or prove period completeness.
+      parameters:
+        - $ref: "#/components/parameters/TenantId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [documentId, columns, currency, numberFormat, balancePosition]
+              properties:
+                documentId: { type: string }
+                currency: { type: string, enum: [EUR] }
+                numberFormat: { type: string, enum: [decimal-dot, decimal-comma] }
+                balancePosition: { type: string, enum: [after_transaction] }
+                columns:
+                  type: object
+                  required: [date, id, description, debit, credit, balance]
+                  additionalProperties: { type: string }
+      responses:
+        '200':
+          description: Computed values as decimal strings with row citations or explicit needs_review without totals
+          content:
+            application/json:
+              schema: { type: object }
+        '400': { description: Invalid mapping or convention }
+        '403': { description: Live source access denied }
+        '404': { description: Source unavailable for this client }
+        '409': { description: Use an extracted CSV table within limits }
+  /tenants/{tenantId}/brain/calculations:
+    get:
+      summary: List latest saved calculation summaries, limited to 20 source documents
+      description: Live documents read permission. Source changes mark memories stale. Derived results do not count as independent evidence.
+      parameters:
+        - $ref: "#/components/parameters/TenantId"
+      responses:
+        '200':
+          description: Current or stale conditional calculation summaries
+          content:
+            application/json:
+              schema: { type: object }
+        '403': { description: Live source access denied }
+    post:
+      summary: Save a versioned encrypted conditional calculation artifact
+      description: Live documents read and write permissions. Validates current CSV mapping, EUR, numeric convention, provenance and Brain Contract derived artifact schema. Source deletion purges history. Same inputs reuse the latest artifact, never independent evidence.
+      parameters:
+        - $ref: "#/components/parameters/TenantId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [documentId, columns, currency, numberFormat, balancePosition]
+              properties:
+                documentId: { type: string }
+                currency: { type: string, enum: [EUR] }
+                numberFormat: { type: string, enum: [decimal-dot, decimal-comma] }
+                balancePosition: { type: string, enum: [after_transaction] }
+                columns:
+                  type: object
+                  required: [date, id, description, debit, credit, balance]
+                  additionalProperties: { type: string }
+      responses:
+        '201':
+          description: Encrypted artifact saved or latest identical version reused
+          content:
+            application/json:
+              schema: { type: object }
+        '400': { description: Invalid mapping }
+        '403': { description: Write permission required }
+        '409': { description: Source or contract needs review }
+        '413': { description: History limit reached - 20 documents, 20 versions per document, 200 artifacts or 32 MiB history }
+  /tenants/{tenantId}/brain/calculations/{calculationId}:
+    get:
+      summary: Read a full source-linked calculation artifact and original row citations
+      parameters:
+        - $ref: "#/components/parameters/TenantId"
+        - name: calculationId
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: Full derived artifact with current, stale or superseded state
+          content:
+            application/json:
+              schema: { type: object }
+        '403': { description: Live source access denied }
+        '404': { description: Artifact unavailable inside this client }
+  /tenants/{tenantId}/brain/checklists:
+    parameters:
+      - $ref: "#/components/parameters/TenantId"
+    get:
+      operationId: listChecklists
+      description: Explicit human requirements with encrypted revisions; evidence from live original fragments. Reviewed items require explicit confirmation, except unchanged previously recorded reviews. Deletion of any historically linked original purges the entire checklist and its history.
+      responses:
+        "200":
+          description: Attributed versioned checklist or list; current source changes downgrade item state to needs_review
+        "400": {description: Invalid period, requirements, evidence or missing review confirmation}
+        "403": {description: Live client access denied}
+        "404": {description: Checklist unavailable}
+        "409": {description: Revision conflict}
+        "413": {description: Checklist or history size limit}
+    post:
+      operationId: createChecklist
+      description: Explicit human requirements with encrypted revisions; evidence from live original fragments. Reviewed items require explicit confirmation, except unchanged previously recorded reviews. Deletion of any historically linked original purges the entire checklist and its history.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [title, periodStart, periodEnd, items]
+              properties:
+                title: {type: string, minLength: 1, maxLength: 160}
+                periodStart: {type: string, format: date}
+                periodEnd: {type: string, format: date}
+                expectedVersion: {type: integer, minimum: 0}
+                confirmHumanReview: {type: boolean}
+                items:
+                  type: array
+                  minItems: 1
+                  maxItems: 100
+                  items:
+                    type: object
+                    required: [requirement, status, references]
+                    properties:
+                      id: {type: string, maxLength: 80}
+                      requirement: {type: string, minLength: 1, maxLength: 500}
+                      status: {type: string, enum: [missing, received, reviewed]}
+                      references:
+                        type: array
+                        maxItems: 10
+                        items:
+                          type: object
+                          required: [documentId, fragmentId]
+                          properties:
+                            documentId: {type: string}
+                            fragmentId: {type: string}
+      responses:
+        "201":
+          description: Attributed versioned checklist or list; current source changes downgrade item state to needs_review
+        "400": {description: Invalid period, requirements, evidence or missing review confirmation}
+        "403": {description: Live client access denied}
+        "404": {description: Checklist unavailable}
+        "409": {description: Revision conflict}
+        "413": {description: Checklist or history size limit}
+
+  /tenants/{tenantId}/brain/checklists/{checklistId}:
+    parameters:
+      - $ref: "#/components/parameters/TenantId"
+      - name: checklistId
+        in: path
+        required: true
+        schema: {type: string}
+    get:
+      operationId: getChecklistHistory
+      description: Explicit human requirements with encrypted revisions; evidence from live original fragments. Reviewed items require explicit confirmation, except unchanged previously recorded reviews. Deletion of any historically linked original purges the entire checklist and its history.
+      responses:
+        "200":
+          description: Attributed versioned checklist or list; current source changes downgrade item state to needs_review
+        "400": {description: Invalid period, requirements, evidence or missing review confirmation}
+        "403": {description: Live client access denied}
+        "404": {description: Checklist unavailable}
+        "409": {description: Revision conflict}
+        "413": {description: Checklist or history size limit}
+    put:
+      operationId: reviseChecklist
+      description: Explicit human requirements with encrypted revisions; evidence from live original fragments. Reviewed items require explicit confirmation, except unchanged previously recorded reviews. Deletion of any historically linked original purges the entire checklist and its history.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [title, periodStart, periodEnd, items]
+              properties:
+                title: {type: string, minLength: 1, maxLength: 160}
+                periodStart: {type: string, format: date}
+                periodEnd: {type: string, format: date}
+                expectedVersion: {type: integer, minimum: 0}
+                confirmHumanReview: {type: boolean}
+                items:
+                  type: array
+                  minItems: 1
+                  maxItems: 100
+                  items:
+                    type: object
+                    required: [requirement, status, references]
+                    properties:
+                      id: {type: string, maxLength: 80}
+                      requirement: {type: string, minLength: 1, maxLength: 500}
+                      status: {type: string, enum: [missing, received, reviewed]}
+                      references:
+                        type: array
+                        maxItems: 10
+                        items:
+                          type: object
+                          required: [documentId, fragmentId]
+                          properties:
+                            documentId: {type: string}
+                            fragmentId: {type: string}
+      responses:
+        "200":
+          description: Attributed versioned checklist or list; current source changes downgrade item state to needs_review
+        "400": {description: Invalid period, requirements, evidence or missing review confirmation}
+        "403": {description: Live client access denied}
+        "404": {description: Checklist unavailable}
+        "409": {description: Revision conflict}
+        "413": {description: Checklist or history size limit}
+
+  /tenants/{tenantId}/brain/assertions:
+    parameters:
+      - $ref: '#/components/parameters/TenantId'
+    get:
+      summary: Human sourced assertions with current source state and possible differences
+      description: Requires live documents:read. These are attributed human statements, not independent evidence or model output.
+      responses:
+        '200': { description: Current assertions including conditional effectiveStatus }
+        '403': { description: No live permission }
+    post:
+      summary: Create an encrypted sourced human assertion
+      description: Requires live documents:read and documents:write and registered human membership. Origin and confidence are server controlled.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/HumanAssertionInput' }
+      responses:
+        '201': { description: Attributed version with confidence null and contract_version 1.1.0 }
+        '400': { description: Invalid content or evidence or missing review confirmation }
+        '403': { description: No live permission }
+  /tenants/{tenantId}/brain/assertions/{assertionId}:
+    parameters:
+      - $ref: '#/components/parameters/TenantId'
+      - name: assertionId
+        in: path
+        required: true
+        schema: { type: string }
+    get:
+      summary: Historical human assertion revisions
+      responses:
+        '200': { description: Historical attributed revisions; current source validation is provided by the list endpoint }
+        '404': { description: Unavailable in this tenant }
+    put:
+      summary: Revise or review an assertion with optimistic version control
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/HumanAssertionInput' }
+      responses:
+        '200': { description: New encrypted revision; approval requires explicit human confirmation on every revision }
+        '400': { description: Invalid review or source }
+        '403': { description: No live permission }
+        '404': { description: Unavailable in this tenant }
+        '409': { description: Revision conflict }
+
+  /tenants/{tenantId}/advisor/requests:
+    parameters:
+      - $ref: "#/components/parameters/TenantId"
+    get:
+      summary: List encrypted Advisor history and actual gateway readiness
+      responses:
+        "200": { description: Client-scoped data array; configured is not hardware proof }
+        "403": { description: Live client read permission required }
+    post:
+      summary: Queue a persistent client Advisor question
+      description: Requires live user membership with jobs write and documents read. Input and output are encrypted. Disabled inference leaves requests queued. Expired running requests become uncertain and are never automatically replayed. Exact quotation checks do not validate business entailment. Selected calculations are deterministic derived results from one source, without period-completeness or payment claims.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [question]
+              properties:
+                question: { type: string, minLength: 2, maxLength: 500 }
+                context: { type: string, maxLength: 2000 }
+                period:
+                  type: object
+                  additionalProperties: false
+                  required: [start, end]
+                  properties:
+                    start: { type: string, format: date }
+                    end: { type: string, format: date }
+                contributions:
+                  type: array
+                  maxItems: 4
+                  items:
+                    type: object
+                    additionalProperties: false
+                    required: [kind, id]
+                    properties:
+                      kind: { type: string, enum: [note, assertion, checklist, wiki] }
+                      id: { type: string, maxLength: 120 }
+                calculationIds:
+                  type: array
+                  maxItems: 2
+                  uniqueItems: true
+                  items: { type: string, maxLength: 120 }
+      responses:
+        "202": { description: Stored request; no guarantee inference was executed }
+        "400": { description: Invalid question, context, dates or selected calculations }
+        "403": { description: Live write/read permission required }
+        "409": { description: Calculation/source is stale }
+  /tenants/{tenantId}/advisor/requests/{advisorId}:
+    parameters:
+      - $ref: "#/components/parameters/TenantId"
+      - name: advisorId
+        in: path
+        required: true
+        schema: { type: string }
+    get:
+      summary: Read a client request and any historical answer with stale flags
+      responses:
+        "200": { description: Request and encrypted answer decoded for an authorized reader }
+        "403": { description: Live read permission required }
+        "404": { description: Request unavailable }
+    delete:
+      summary: Cancel a queued or running request
+      description: Cancellation prevents publication; a dispatched call may still consume provider quota. No automatic refund or retry.
+      responses:
+        "200": { description: Current terminal or cancelled request state }
+        "403": { description: Live jobs write and read permission required }
+        "404": { description: Request unavailable }
+  /tenants/{tenantId}/advisor/contributions:
+    parameters:
+      - $ref: "#/components/parameters/TenantId"
+    get:
+      summary: List attributed human contributions available for explicit selection
+      description: Notes, non-rejected current assertions and explicit checklists are human/derived context, never independent original evidence. Changed revisions invalidate a queued answer.
+      responses:
+        "200": { description: Client-scoped contribution options }
+        "403": { description: Live documents read permission required }
+  /tenants/{tenantId}/advisor/requests/{advisorId}/review:
+    parameters:
+      - $ref: "#/components/parameters/TenantId"
+      - name: advisorId
+        in: path
+        required: true
+        schema: { type: string }
+    put:
+      summary: Record an attributed encrypted human review of a completed current answer
+      description: Review is human confirmation, not measured model accuracy or proof of truth. All revisions are exported and deleted with the source-linked job.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [status, comment, expectedVersion, confirmHumanReview]
+              properties:
+                status: { type: string, enum: [approved, rejected, needs_review] }
+                comment: { type: string, minLength: 1, maxLength: 2000 }
+                expectedVersion: { type: integer, minimum: 0 }
+                confirmHumanReview: { type: boolean, enum: [true] }
+      responses:
+        "200": { description: Attributed current review and encrypted review history }
+        "400": { description: Explicit confirmation or bounded comment missing }
+        "403": { description: Live documents read and write permission required }
+        "409": { description: Answer unavailable, stale or review version conflict }
+  /tenants/{tenantId}/brain/memory:
+    parameters:
+      - $ref: "#/components/parameters/TenantId"
+    get:
+      summary: List client wiki proposals and gateway readiness
+      responses:
+        "200": { description: Source-state and bounded-coverage metadata; model proposals pending human review }
+        "403": { description: Live client read permission required }
+    post:
+      summary: Queue document classification and wiki proposal from extracted original text
+      description: Input/output encrypted; stable dispatch ID; expired running jobs uncertain without retry. Up to twelve original passages and 24000 characters. Exact quotes and entity co-occurrence do not prove semantics. Disabled AMD leaves requests queued; no simulation.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - type: object
+                  additionalProperties: false
+                  required: [documentId]
+                  properties:
+                    documentId: { type: string }
+                - type: object
+                  additionalProperties: false
+                  required: [kind, documentId, page]
+                  properties:
+                    kind: { type: string, enum: [vision] }
+                    documentId: { type: string }
+                    page: { type: integer, minimum: 1, maximum: 50 }
+                - type: object
+                  additionalProperties: false
+                  required: [kind, transcriptionId]
+                  properties:
+                    kind: { type: string, enum: [wiki_from_vision] }
+                    transcriptionId: { type: string }
+              description: Reviewed visual transcription remains model-derived text. Only current approved non-ambiguous blocks can feed wiki, search and Advisor. Later review changes invalidate downstream outputs; original page/bbox lineage retained.
+      responses:
+        "202": { description: Persisted queued request }
+        "400": { description: Invalid document selection }
+        "403": { description: Live read and jobs write permission required }
+        "409": { description: Original not extracted, empty or inconsistent }
+  /tenants/{tenantId}/brain/memory/{memoryId}:
+    parameters:
+      - $ref: "#/components/parameters/TenantId"
+      - name: memoryId
+        in: path
+        required: true
+        schema: { type: string }
+    get:
+      summary: Read source-linked wiki proposal or pending request
+      responses:
+        "200": { description: Authorized client request }
+        "403": { description: Live client read permission required }
+        "404": { description: Request unavailable }
+    delete:
+      summary: Cancel queued or running wiki request
+      responses:
+        "200": { description: Current request state; dispatched call may consume provider quota }
+        "403": { description: Live jobs write and read permission required }
+  /tenants/{tenantId}/brain/memory/{memoryId}/review:
+    parameters:
+      - $ref: "#/components/parameters/TenantId"
+      - name: memoryId
+        in: path
+        required: true
+        schema: { type: string }
+    put:
+      summary: Record an attributed human review of a current completed wiki
+      description: Requires documents read and write. Review history encrypted, optimistic and source-linked. Approval does not turn a model proposal into independent evidence or measured truth. Only approved current wiki proposals are offered as explicit Advisor context and in derived wiki search.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [status, comment, expectedVersion, confirmHumanReview]
+              properties:
+                status: { type: string, enum: [approved, rejected, needs_review] }
+                comment: { type: string, minLength: 1, maxLength: 2000 }
+                expectedVersion: { type: integer, minimum: 0 }
+                confirmHumanReview: { type: boolean, enum: [true] }
+      responses:
+        "200": { description: Current review and full attributed history }
+        "400": { description: Confirmation or bounded comment missing }
+        "403": { description: Live read/write permission required }
+        "409": { description: Wiki/source stale, pending or review version changed }
+  /tenants/{tenantId}/brain/memory/{memoryId}/page:
+    parameters:
+      - $ref: "#/components/parameters/TenantId"
+      - name: memoryId
+        in: path
+        required: true
+        schema: { type: string }
+    get:
+      summary: Read canonical original page for comparing a visual transcription
+      description: Locally rasterized PNG, not AI. Live read permission/epoch and original hash checked before and after preparation. No persisted plaintext page or remote image URL.
+      responses:
+        "200":
+          description: Bounded PNG preview
+          content:
+            image/png:
+              schema: { type: string, format: binary }
+        "403": { description: Authorization unavailable or changed }
+        "404": { description: Request unavailable }
+        "409": { description: Original changed or unsupported }
+components:
+  securitySchemes:
+    oidc:
+      type: openIdConnect
+      openIdConnectUrl: https://identity.example.com/.well-known/openid-configuration
+  parameters:
+    TenantId:
+      name: tenantId
+      in: path
+      required: true
+      schema: { type: string, format: uuid }
+    DocumentId:
+      name: documentId
+      in: path
+      required: true
+      schema: { type: string, format: uuid }
+  responses:
+    Unauthorized:
+      description: Missing, expired or invalid access token
+      content: { application/json: { schema: { $ref: "#/components/schemas/ErrorEnvelope" } } }
+    Forbidden:
+      description: Tenant membership or scope is insufficient
+      content: { application/json: { schema: { $ref: "#/components/schemas/ErrorEnvelope" } } }
+    NotFound:
+      description: Resource not found in the authorized tenant
+      content: { application/json: { schema: { $ref: "#/components/schemas/ErrorEnvelope" } } }
+    Conflict:
+      description: Resource state or idempotency conflict
+      content: { application/json: { schema: { $ref: "#/components/schemas/ErrorEnvelope" } } }
+    TooLarge:
+      description: Upload exceeds configured limit
+      content: { application/json: { schema: { $ref: "#/components/schemas/ErrorEnvelope" } } }
+  schemas:
+    HumanAssertionInput:
+      type: object
+      required: [subject, predicate, value, context, references]
+      properties:
+        subject: { type: string, minLength: 1, maxLength: 160 }
+        predicate: { type: string, minLength: 1, maxLength: 160 }
+        value: { type: string, minLength: 1, maxLength: 2000 }
+        context: { type: string, minLength: 1, maxLength: 160, description: Human-declared grouping context; no automatic entity resolution }
+        status: { enum: [proposed, verified, rejected], default: proposed }
+        expectedVersion: { type: integer, minimum: 0 }
+        confirmHumanReview: { type: boolean, description: Required for verified or rejected; this records a human decision, not measured accuracy }
+        references:
+          type: array
+          minItems: 1
+          maxItems: 10
+          items:
+            type: object
+            required: [documentId, fragmentId]
+            properties:
+              documentId: { type: string }
+              fragmentId: { type: string }
+    Principal:
+      type: object
+      required: [id, type, role, scopes]
+      properties:
+        id: { type: string }
+        type: { type: string, enum: [user, service] }
+        role: { type: string }
+        scopes: { type: array, items: { type: string } }
+    OrganizationCreate:
+      type: object
+      required: [name, type]
+      properties:
+        name: { type: string, minLength: 1, maxLength: 200 }
+        type: { type: string, enum: [studio, pmi, partner, platform] }
+    Organization:
+      allOf:
+        - $ref: "#/components/schemas/OrganizationCreate"
+        - type: object
+          required: [id, createdAt]
+          properties:
+            id: { type: string, format: uuid }
+            createdAt: { type: string, format: date-time }
+    UserCreate:
+      type: object
+      required: [id, email, displayName]
+      properties:
+        id: { type: string, description: OIDC subject }
+        email: { type: string, format: email }
+        displayName: { type: string }
+    User:
+      allOf:
+        - $ref: "#/components/schemas/UserCreate"
+        - type: object
+          properties: { createdAt: { type: string, format: date-time } }
+    TenantCreate:
+      type: object
+      required: [organizationId, name]
+      properties:
+        organizationId: { type: string, format: uuid }
+        externalId: { type: [string, "null"] }
+        name: { type: string }
+        region: { type: string, default: eu }
+        retentionDays: { type: integer, minimum: 1, default: 365 }
+    Tenant:
+      type: object
+      required: [id, organizationId, name, status, region, retentionDays, createdAt]
+      properties:
+        id: { type: string, format: uuid }
+        organizationId: { type: string, format: uuid }
+        externalId: { type: [string, "null"] }
+        name: { type: string }
+        status: { type: string, enum: [active, restricted, suspended, erased] }
+        region: { type: string }
+        retentionDays: { type: integer }
+        createdAt: { type: string, format: date-time }
+    MembershipUpsert:
+      type: object
+      required: [userId, role, scopes]
+      properties:
+        userId: { type: string }
+        role: { type: string }
+        scopes: { type: array, items: { type: string } }
+    Membership:
+      allOf:
+        - $ref: "#/components/schemas/MembershipUpsert"
+        - type: object
+          properties: { tenantId: { type: string, format: uuid } }
+    Document:
+      type: object
+      required: [id, tenantId, filename, mimeType, sizeBytes, sha256, status, createdBy, createdAt]
+      properties:
+        id: { type: string, format: uuid }
+        tenantId: { type: string, format: uuid }
+        filename: { type: string }
+        mimeType: { type: string }
+        sizeBytes: { type: integer }
+        sha256: { type: string, pattern: "^[a-f0-9]{64}$" }
+        status: { type: string }
+        createdBy: { type: string }
+        createdAt: { type: string, format: date-time }
+        deletedAt: { type: [string, "null"], format: date-time }
+    Job:
+      type: object
+      required: [id, tenantId, type, status, createdAt]
+      properties:
+        id: { type: string, format: uuid }
+        tenantId: { type: string, format: uuid }
+        type: { type: string }
+        status: { type: string, enum: [queued, running, completed, completed_with_errors, failed, cancelled] }
+        input: { type: object, additionalProperties: true }
+        output: { type: [object, "null"], additionalProperties: true }
+        createdAt: { type: string, format: date-time }
+        completedAt: { type: [string, "null"], format: date-time }
+    AuditEvent:
+      type: object
+      required: [id, tenantId, actorId, actorType, action, metadata, eventHash, createdAt]
+      properties:
+        id: { type: string, format: uuid }
+        tenantId: { type: string }
+        actorId: { type: string }
+        actorType: { type: string }
+        action: { type: string }
+        targetType: { type: [string, "null"] }
+        targetId: { type: [string, "null"] }
+        metadata: { type: object, additionalProperties: true }
+        previousEventHash: { type: [string, "null"] }
+        eventHash: { type: string }
+        createdAt: { type: string, format: date-time }
+    PrivacyExport:
+      type: object
+      required: [requestId, manifestSha256, payload]
+      properties:
+        requestId: { type: string, format: uuid }
+        manifestSha256: { type: string }
+        payload: { type: object, additionalProperties: true }
+    ErasureReceipt:
+      type: object
+      required: [requestId, resultHash, documentsDeleted, erasedAt]
+      properties:
+        requestId: { type: string, format: uuid }
+        resultHash: { type: string }
+        documentsDeleted: { type: integer }
+        erasedAt: { type: string, format: date-time }
+    ExternalMapping:
+      type: object
+      required: [partnerClientId, resourceType, externalId, internalId]
+      properties:
+        partnerClientId: { type: string, format: uuid }
+        tenantId: { type: string, format: uuid, readOnly: true }
+        resourceType: { type: string, examples: [customer, document, report] }
+        externalId: { type: string }
+        internalId: { type: string }
+        createdAt: { type: string, format: date-time, readOnly: true }
+    ErrorEnvelope:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: object
+          required: [code, message, requestId]
+          properties:
+            code: { type: string }
+            message: { type: string }
+            details: {}
+            requestId: { type: string }
+
+# advisor_analysis requires advisorId for a completed, current request.
+# Review or source changes invalidate pending render and stale download.

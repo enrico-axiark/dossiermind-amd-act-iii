@@ -1,0 +1,73 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://dossiermind.local/schemas/tenant-brain-profile.v1.json",
+  "title": "DossierMind Tenant Brain Profile",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "profile_version", "contract_version", "tenant_id", "locale", "timezone", "region",
+    "taxonomy_version", "enabled_document_types", "autonomy", "review", "providers",
+    "retention", "connectors"
+  ],
+  "properties": {
+    "profile_version": { "type": "string", "minLength": 1 },
+    "contract_version": { "type": "string", "minLength": 1 },
+    "tenant_id": { "type": "string", "minLength": 1 },
+    "locale": { "type": "string", "minLength": 2 },
+    "timezone": { "type": "string", "minLength": 1 },
+    "region": { "type": "string", "minLength": 1 },
+    "taxonomy_version": { "type": "string", "minLength": 1 },
+    "enabled_document_types": { "type": "array", "uniqueItems": true, "items": { "type": "string", "minLength": 1 } },
+    "autonomy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["auto_publish_deterministic", "model_assertion_review_threshold", "professional_outputs_require_approval"],
+      "properties": {
+        "auto_publish_deterministic": { "type": "boolean" },
+        "model_assertion_review_threshold": { "type": "number", "minimum": 0, "maximum": 1 },
+        "professional_outputs_require_approval": { "const": true }
+      }
+    },
+    "review": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["allowed_roles", "conflicts_require_review", "entity_merge_requires_review"],
+      "properties": {
+        "allowed_roles": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "type": "string" } },
+        "conflicts_require_review": { "const": true },
+        "entity_merge_requires_review": { "type": "boolean" }
+      }
+    },
+    "providers": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["training_allowed", "retention", "adapter_ids"],
+      "properties": {
+        "training_allowed": { "const": false },
+        "retention": { "type": "string", "minLength": 1 },
+        "adapter_ids": { "type": "object", "additionalProperties": { "type": ["string", "null"] } }
+      }
+    },
+    "retention": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["policy_id", "legal_hold_supported"],
+      "properties": {
+        "policy_id": { "type": "string", "minLength": 1 },
+        "legal_hold_supported": { "const": true }
+      }
+    },
+    "connectors": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "enabled"],
+        "properties": {
+          "id": { "type": "string", "minLength": 1 },
+          "enabled": { "type": "boolean" }
+        }
+      }
+    }
+  }
+}

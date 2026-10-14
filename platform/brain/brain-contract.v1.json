@@ -1,0 +1,90 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "contractId": "dossiermind.digital-brain",
+  "contractVersion": "1.0.0",
+  "status": "specified-not-implemented",
+  "providerNeutral": true,
+  "canonicalRules": [
+    "BR-001", "BR-002", "BR-003", "BR-004", "BR-005", "BR-006",
+    "BR-007", "BR-008", "BR-009", "BR-010", "BR-011", "BR-012",
+    "BR-013", "BR-014", "BR-015", "BR-016", "BR-017", "BR-018"
+  ],
+  "layers": [
+    { "id": "evidence", "canonical": true, "objects": ["source_object"] },
+    { "id": "normalized_content", "canonical": true, "objects": ["document_version", "content_fragment"] },
+    { "id": "structured_knowledge", "canonical": true, "objects": ["entity", "assertion", "relation", "evidence_link"] },
+    { "id": "operational_memory", "canonical": true, "objects": ["event", "task", "question", "decision", "review"] },
+    { "id": "retrieval_projection", "canonical": false, "rebuildable": true, "objects": ["search_document", "embedding", "graph_projection"] },
+    { "id": "derived_output", "canonical": true, "objects": ["answer", "report", "citation", "manifest"] },
+    { "id": "governance", "canonical": true, "objects": ["audit_event", "retention_rule", "legal_hold", "deletion_request"] }
+  ],
+  "pipeline": {
+    "initialState": "received",
+    "terminalStates": ["ready", "failed", "rejected", "deleted"],
+    "states": [
+      "received", "quarantined", "scanned", "parsed", "normalized", "extracted",
+      "reconciled", "review_pending", "indexed", "ready", "failed", "rejected",
+      "revoked", "deletion_pending", "deleted"
+    ],
+    "transitions": [
+      ["received", "quarantined"], ["quarantined", "scanned"], ["scanned", "parsed"],
+      ["parsed", "normalized"], ["normalized", "extracted"], ["extracted", "reconciled"],
+      ["reconciled", "review_pending"], ["reconciled", "indexed"], ["review_pending", "indexed"],
+      ["indexed", "ready"], ["received", "rejected"], ["quarantined", "rejected"],
+      ["scanned", "rejected"], ["parsed", "failed"], ["normalized", "failed"],
+      ["extracted", "failed"], ["reconciled", "failed"], ["review_pending", "failed"],
+      ["ready", "revoked"], ["revoked", "ready"], ["ready", "deletion_pending"],
+      ["revoked", "deletion_pending"], ["deletion_pending", "deleted"]
+    ]
+  },
+  "autonomy": {
+    "automatic": ["delta_detection", "hashing", "malware_scan", "parsing", "ocr", "fragmentation", "index_rebuild", "conflict_flagging"],
+    "assisted": ["ambiguous_entity_resolution", "low_confidence_assertion", "sensitive_classification", "professional_report_draft"],
+    "humanOnly": ["professional_judgment", "external_action", "final_professional_report", "policy_override", "legal_hold_override"]
+  },
+  "provenance": {
+    "required": [
+      "tenant_id", "source_object_id", "document_version_id", "fragment_id",
+      "component", "component_version", "contract_version", "created_at",
+      "confidence", "review_status"
+    ],
+    "derivedEvidencePolicy": "same-lineage-derived-artifacts-do-not-count-as-independent-evidence"
+  },
+  "providerAdapter": {
+    "operations": ["extract_text", "classify", "extract_knowledge", "embed", "answer"],
+    "requiredPolicyInputs": ["tenant_id", "region", "retention", "training_allowed", "timeout_ms", "cost_limit", "model_id"],
+    "requiredControls": ["server_side_authorization", "structured_output_validation", "prompt_data_separation", "audit", "kill_switch"]
+  },
+  "tenantIsolation": {
+    "enforcementPoints": ["api", "database", "object_storage", "queue", "worker", "search", "vector_index", "cache", "export", "audit"],
+    "crossTenantReferences": "deny-unless-explicit-grant-object",
+    "testRequirement": "bait-document-negative-tests"
+  },
+  "feedback": {
+    "allowedTypes": ["confirm", "reject", "correct", "merge_entities", "split_entity", "professional_decision", "usefulness_rating"],
+    "requiredAttribution": ["actor_id", "actor_role", "tenant_id", "reason", "created_at"],
+    "externalTrainingDefault": false
+  },
+  "derivedArtifacts": {
+    "types": ["answer", "summary", "report", "export"],
+    "mayBeRetrieved": true,
+    "maySelfConfirm": false,
+    "recursiveIngestion": "blocked",
+    "required": ["lineage_id", "evidence_ids", "policy_version", "generation_component", "generation_component_version"]
+  },
+  "deletion": {
+    "propagatesTo": ["source", "normalized_content", "dependent_knowledge", "embeddings", "search_index", "graph_projection", "cache", "temporary_payloads"],
+    "legalHoldPrecedence": true,
+    "manifestRequired": true
+  },
+  "schemas": {
+    "sourceObject": "schemas/source-object.schema.json",
+    "knowledgeAssertion": "schemas/knowledge-assertion.schema.json",
+    "derivedArtifact": "schemas/derived-artifact.schema.json",
+    "processingEvent": "schemas/processing-event.schema.json",
+    "tenantProfile": "schemas/tenant-brain-profile.schema.json"
+  },
+  "taxonomy": "taxonomy/core-taxonomy.v1.json",
+  "defaultTenantProfile": "profiles/default-tenant-profile.v1.json",
+  "referenceVault": "reference-vault/vault-manifest.v1.json"
+}
