@@ -26,7 +26,10 @@ export function prepareAdvisorEvidence(db,config,tenantId,principal,question){
  const accessEpoch=access(db,principal,tenantId);
  assert(typeof question==='string'&&question.trim().length>=2&&question.length<=500,400,'validation_error','Question must contain 2 to 500 characters');
  const stopwords=new Set('a ad al alla alle allo ai agli anche abbiamo che chi ci come con da dal dalla dalle dei del della delle dello di e è ed gli ha hai hanno ho i il in io la le lo ma mi nel nella nelle noi o per più quale quali quanto questa questo queste questi se si sono su sul sulla tra un una uno voi'.split(' '));
- const terms=(question.toLowerCase().match(/[\p{L}\p{N}]+/gu)||[]).filter(word=>!stopwords.has(word));
+ const allTerms=[...new Set((question.normalize('NFKD').replace(/\p{M}/gu,'').toLowerCase().match(/[\p{L}\p{N}]+/gu)||[]).filter(word=>!stopwords.has(word)))];
+ // Keep the full question for the model. Bound only lexical retrieval work,
+ // rather than rejecting a valid question with more than 30 distinct terms.
+ const terms=allTerms.slice(0,30);
  const result=terms.length?searchFragments(db,config,tenantId,terms.join(' ')):{data:[],method:'lexical-bm25',totalMatches:0},evidence=[];let characters=0;
  const bundles=new Map(),candidates=[],seen=new Set();
  function candidate(fragment,filename,relation='matched',anchorId=null){
@@ -57,7 +60,7 @@ export function prepareAdvisorEvidence(db,config,tenantId,principal,question){
   evidence.push({evidenceId:'E'+(evidence.length+1),text,reference:visual.reference,displayColumns:null,truncated:text.length<visual.text.length,relation:'reviewed-visual-transcription',origin:visual.origin,independentEvidence:false,textVerified:false,review:visual.review});
  }
  access(db,principal,tenantId);
- return {question:question.trim(),accessEpoch,evidence,retrieval:{method:result.method,totalMatches:result.totalMatches,rankingIsConfidence:false,completeArchiveCoverage:false},limitations:['Only bounded extracted passages and reviewed visual transcription; lexical retrieval and same-row context can miss relevant cells or evidence. Table columns are not interpreted automatically.','Human contributions, reviewed visual transcription and derived calculations are not independent original evidence.']};
+ return {question:question.trim(),accessEpoch,evidence,retrieval:{method:result.method,totalMatches:result.totalMatches,queryTermsTotal:allTerms.length,queryTermsUsed:terms.length,queryTruncated:allTerms.length>terms.length,rankingIsConfidence:false,completeArchiveCoverage:false},limitations:['Only bounded extracted passages and reviewed visual transcription; lexical retrieval and same-row context can miss relevant cells or evidence. Table columns are not interpreted automatically.','Human contributions, reviewed visual transcription and derived calculations are not independent original evidence.']};
 }
 export async function selectAdvisorExcerpts(db,config,tenantId,principal,question,gateway,{signal}={}){
  assert(!signal?.aborted,409,'ai_cancelled','Inference was cancelled');

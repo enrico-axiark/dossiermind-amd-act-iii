@@ -2,7 +2,8 @@
 
 Public competition source release. Project code is licensed under MIT.
 Source repository: https://github.com/enrico-axiark/dossiermind-amd-act-iii
-External deployment and online acceptance are still pending.
+Public demo: https://dossiermind-amd-act-iii.onrender.com/app/
+Deployment is live; online acceptance is in progress.
 Only this prototype is in scope. It contains no production customer archive.
 All supplied document examples are fabricated for testing and demonstration.
 

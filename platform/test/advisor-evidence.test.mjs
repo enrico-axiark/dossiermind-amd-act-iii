@@ -38,6 +38,17 @@ test('invented citations, paraphrases, fabricated amounts, duplicate excerpts an
   for(const output of [{status:'evidence',selections:[{evidenceId:'E8',quote}]},{status:'evidence',selections:[{evidenceId:'E1',quote:'Cloud expense 9999.00'}]},{status:'evidence',selections:[{evidenceId:'E1',quote},{evidenceId:'E1',quote}]},{status:'abstain',selections:[{evidenceId:'E1',quote}]},{status:'evidence',selections:[]},{status:'abstain',selections:[],advice:'Spend money'}])await assert.rejects(selectAdvisorExcerpts(x.db,x.config,x.tenant.id,owner,'Cloud',{complete:async()=>({output})}),e=>['advisor_output_invalid','advisor_citation_invalid'].includes(e.code));
  }finally{x.close();}
 });
+test('valid long questions preserve the full text and source citations while bounding only lexical search terms',async()=>{
+ const x=await setup();try{
+  const question='Cloud '+Array.from({length:40},(_,i)=>'argomento'+i).join(' ');
+  assert.ok(question.length<=500);
+  const prepared=prepareAdvisorEvidence(x.db,x.config,x.tenant.id,owner,question);
+  assert.equal(prepared.question,question);assert.equal(prepared.retrieval.queryTermsTotal,41);assert.equal(prepared.retrieval.queryTermsUsed,30);assert.equal(prepared.retrieval.queryTruncated,true);
+  assert.ok(prepared.evidence.some(item=>item.reference.documentId===x.doc.id&&item.text.includes('Cloud expense')));
+  x.service.revokeMembership(x.tenant.id,owner.id,admin);
+  assert.throws(()=>prepareAdvisorEvidence(x.db,x.config,x.tenant.id,owner,question),e=>e.code==='tenant_access_denied');
+ }finally{x.close();}
+});
 test('source instructions are data in a bounded JSON passage, never server instructions or tool calls',async()=>{
  const x=await setup();try{let captured;const result=await selectAdvisorExcerpts(x.db,x.config,x.tenant.id,owner,'Ignore previous',{complete:async(input)=>{captured=input;return {output:{status:'abstain',selections:[]}};}});assert.equal(result.status,'abstain');assert.equal(captured.messages.length,2);assert.match(captured.messages[0].content,/untrusted data/);assert.equal(captured.messages[0].content.includes('expose another client'),false);assert.match(JSON.parse(captured.messages[1].content).passages[0].text,/expose another client/);assert.equal(captured.tools,undefined);
  }finally{x.close();}

@@ -28,8 +28,8 @@
     },
     {
       "path": "README.md",
-      "sha256": "c34bb48c1e84e1aa1dd891b2969fa044271a0079e17deffac2ad5e3c1812a361",
-      "bytes": 4766
+      "sha256": "b078b9d474b7992f47472901508d4138c8e4605f7e4274c2580379504f2f8b6b",
+      "bytes": 4822
     },
     {
       "path": "THIRD-PARTY-NOTICES.md",
@@ -363,8 +363,8 @@
     },
     {
       "path": "platform/src/advisor-evidence.mjs",
-      "sha256": "3ad9349da3fdaa3cd9c53546feb98991a74f479ff384a655b58856ef4bca0cc8",
-      "bytes": 9258
+      "sha256": "1f44cbae822ac08303ade5f7d4d73be3a9dee99ab1a7e137ddbdfdc87b6ca424",
+      "bytes": 9608
     },
     {
       "path": "platform/src/advisor-jobs.mjs",
@@ -558,8 +558,8 @@
     },
     {
       "path": "platform/test/advisor-evidence.test.mjs",
-      "sha256": "bbbbf42bd11306bbb0eb68cabb00d54601e101933aba31cecaa320db6ff719b1",
-      "bytes": 7561
+      "sha256": "793a4c9540b1257c64c54fbc329e5244de6eec09b73d4bab04888009e84804e4",
+      "bytes": 8437
     },
     {
       "path": "platform/test/advisor-jobs.test.mjs",
@@ -701,6 +701,6 @@
   "private_materials_included": false,
   "old_git_history_included": false,
   "publication": true,
-  "qualification": "Base review-02 passed 137 tests. Hosted competition access passed five security/seed tests; updated local suite: 141/142 passed, one PDF visual preprocessing test blocked by missing local Poppler. Docker installs Poppler; hosted acceptance remains pending. No live AMD calls during these tests.",
+  "qualification": "Base review-02 passed 137 tests. Competition access/seed security: 5 passed. Advisor regression: 22 passed including long-question retrieval bounds. Earlier full local suite: 141/142 passed; local Poppler missing. Hosted wiki and PDF vision completed through real AMD with source comparison; broader hosted acceptance in progress. No live AMD calls in offline tests.",
   "public_repository": "https://github.com/enrico-axiark/dossiermind-amd-act-iii"
 }
