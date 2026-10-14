@@ -51,5 +51,5 @@ proposals and conditional calculations are not independent original evidence.
 Email delivery and unavailable sharing controls are outside the demonstrated flow.
 
 See `PROVENANCE.json` for disclosed preexisting components and `README.md` for
-reproduction instructions. Hosted acceptance is still in progress; this walkthrough
-is not a claim that every step has passed final qualification.
+reproduction instructions. See `ONLINE-QUALIFICATION.md` for the hosted checks
+completed on 14 October 2026 and the remaining prototype limitations.

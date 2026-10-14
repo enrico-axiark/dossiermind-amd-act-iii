@@ -3,7 +3,8 @@
 Public competition source release. Project code is licensed under MIT.
 Source repository: https://github.com/enrico-axiark/dossiermind-amd-act-iii
 Public demo: https://dossiermind-amd-act-iii.onrender.com/app/
-Deployment is live; online acceptance is in progress.
+Deployment is live; the core hosted walkthrough passed on 14 October 2026.
+See `JUDGE-GUIDE.md` and `ONLINE-QUALIFICATION.md` for the tested scope and limits.
 Only this prototype is in scope. It contains no production customer archive.
 All supplied document examples are fabricated for testing and demonstration.
 
@@ -73,7 +74,8 @@ detects changed persistent encryption/audit keys.
 
 Authorize a hosted inference budget separately before enabling AMD. Existing
 local call usage must not be reset by creating this clean snapshot. Never enable
-development authentication online. External deployment acceptance is pending.
+development authentication online. The hosted core walkthrough and restart
+persistence checks passed; this is not production certification.
 
 ## Provenance and publication
 
